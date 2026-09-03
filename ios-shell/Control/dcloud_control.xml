@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- uni-app 离线打包控制文件：appid+离线打包key(iOS)
+     CI 组装时会用 secrets 覆盖 APPID/APPKEY 占位 -->
+<hbuilder>
+<apps>
+    <app appid="__PLACEHOLDER_APPID__" appver=""/>
+</apps>
+</hbuilder>
