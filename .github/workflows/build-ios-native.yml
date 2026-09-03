@@ -84,6 +84,14 @@ jobs:
           c = c.replace('com.dcloud.XXX', 'cn.qyai001.qiuyu').replace('io.dcloud.HBuilder', 'cn.qyai001.qiuyu')
           open(p, 'w').write(c)
           print('bundle id ok')
+          # 砍掉腾讯定位UTS插件:其预编译符号与Xcode16.4链接不匹配(ld: symbol not found DCUTSSequence.subscript.modify)
+          # APP源码无任何uni.getLocation原生调用(仅qqmap jssdk走HTTP),砍掉安全
+          pf = '/tmp/sdk/out/SDK/HBuilder-Hello/Podfile'
+          c2 = open(pf).read()
+          assert "'Geolocation-Tencent'," in c2, 'Podfile锚点没找到'
+          c2 = c2.replace("   'Geolocation-Tencent',", "   # 'Geolocation-Tencent', # 9-4砍:UTS插件链接符号不匹配且APP不用原生定位")
+          open(pf, 'w').write(c2)
+          print('Podfile已砍Geolocation-Tencent')
           PY
           # App图标（demo的AppIcon.appiconset是空目录，注入品牌图标单尺寸方案）
           ICONSET="$HB/HBuilder/Images.xcassets/AppIcon.appiconset"
