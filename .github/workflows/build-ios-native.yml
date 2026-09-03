@@ -152,17 +152,30 @@ jobs:
           security list-keychain -d user -s build.keychain-db
           security set-key-partition-list -S apple-tool:,apple:,codesign: \
             -k temporary-build-keychain build.keychain-db
-          PP_DIR="$HOME/Library/MobileDevice/Provisioning Profiles"
-          mkdir -p "$PP_DIR"
           echo "$PROFILE_B64" | base64 --decode > "$RUNNER_TEMP/profile.mobileprovision"
           UUID=$(security cms -D -i "$RUNNER_TEMP/profile.mobileprovision" | plutil -extract UUID raw -o - -)
-          cp "$RUNNER_TEMP/profile.mobileprovision" "$PP_DIR/$UUID.mobileprovision"
-          echo "profile UUID=$UUID"
+          # Xcode16起老目录~/Library/MobileDevice已废弃,新路径在UserData下;两处都装保险
+          PP_OLD="$HOME/Library/MobileDevice/Provisioning Profiles"
+          PP_NEW="$HOME/Library/Developer/Xcode/UserData/Provisioning Profiles"
+          mkdir -p "$PP_OLD" "$PP_NEW"
+          cp "$RUNNER_TEMP/profile.mobileprovision" "$PP_OLD/$UUID.mobileprovision"
+          cp "$RUNNER_TEMP/profile.mobileprovision" "$PP_NEW/$UUID.mobileprovision"
+          echo "profile UUID=$UUID 已装新路径"
 
       # ── 5. pod install（Podfile里全是本地:path依赖，不需要--repo-update拉Specs大仓）──
       - name: CocoaPods install
         working-directory: /tmp/sdk/out/SDK/HBuilder-Hello
-        run: pod install
+        run: |
+          # Pods是静态库不需要签名,禁掉防止签名参数泼到Pods target报错
+          cat >> Podfile <<'RUBY'
+          post_install do |installer|
+            installer.pods_project.build_configurations.each do |config|
+              config.build_settings['CODE_SIGNING_ALLOWED'] = 'NO'
+              config.build_settings['CODE_SIGNING'] = 'NO'
+            end
+          end
+          RUBY
+          pod install
 
       # ── 6. Archive ──
       - name: Archive (AdHoc)
