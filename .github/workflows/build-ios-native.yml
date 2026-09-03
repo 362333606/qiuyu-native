@@ -43,7 +43,20 @@ jobs:
           mkdir -p /tmp/sdk && cd /tmp/sdk
           unzip -q /tmp/iOS-SDK.zip            # 外层: latest/5.25/SDK.zip
           unzip -q latest/5.25/SDK.zip -d out  # 内层: SDK/, HBuilder-Hello/ ...
-          ls out/
+          # 强校验:解压报成功但内容为空(zip64坑)立即中止
+          python3 - <<'PY'
+          import zipfile, sys
+          z = zipfile.ZipFile('/tmp/sdk/out/../latest/5.25/SDK.zip')
+          files = [i for i in z.infolist() if not i.is_dir()]
+          total = sum(i.file_size for i in files)
+          names = {i.filename for i in files}
+          need = ['SDK/uniapp.podspec', 'SDK/HBuilder-Hello/Podfile', 'SDK/SDK/control.xml']
+          missing = [n for n in need if n not in names]
+          print(f'内层文件数:{len(files)} 展开总:{total/1048576:.0f}MB')
+          if len(files) < 10000 or total < 1_500_000_000 or missing:
+              print('FATAL: SDK解压校验失败 missing=', missing); sys.exit(1)
+          print('SDK校验通过')
+          PY
 
       # ── 3. 组装: www + control.xml + bundle id ──
       - name: Assemble project
