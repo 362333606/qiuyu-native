@@ -90,6 +90,9 @@ jobs:
           c2 = open(pf).read()
           assert "'Geolocation-Tencent'," in c2, 'Podfile锚点没找到'
           c2 = c2.replace("   'Geolocation-Tencent',", "   # 'Geolocation-Tencent', # 9-4砍:UTS插件链接符号不匹配且APP不用原生定位")
+          # 砍外部specs源:全本地:path依赖用不上,且每轮全新runner都clone几GB大仓撞网络抖动(第6轮就死在这)
+          c2 = c2.replace("source 'https://github.com/CocoaPods/Specs.git'", "# source砍:本地依赖不需要,clone大仓撞网络抖动")
+          c2 = c2.replace("source 'https://github.com/volcengine/volcengine-specs.git'", "# source砍:同上")
           open(pf, 'w').write(c2)
           print('Podfile已砍Geolocation-Tencent')
           PY
