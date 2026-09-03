@@ -166,15 +166,20 @@ jobs:
       - name: CocoaPods install
         working-directory: /tmp/sdk/out/SDK/HBuilder-Hello
         run: |
-          # Pods是静态库不需要签名,禁掉防止签名参数泼到Pods target报错
-          cat >> Podfile <<'RUBY'
-          post_install do |installer|
+          # Pods静态库禁签名——注入到已有post_install块内(CocoaPods不支持第二个post_install块)
+          python3 - <<'PY'
+          c = open('Podfile').read()
+          old = "post_install do |installer|\n  UniAppModuleConfig.apply("
+          new = """post_install do |installer|
             installer.pods_project.build_configurations.each do |config|
               config.build_settings['CODE_SIGNING_ALLOWED'] = 'NO'
               config.build_settings['CODE_SIGNING'] = 'NO'
             end
-          end
-          RUBY
+            UniAppModuleConfig.apply("""
+          assert old in c, 'Podfile post_install锚点没找到'
+          open('Podfile','w').write(c.replace(old, new))
+          print('Podfile已注入禁签名')
+          PY
           pod install
 
       # ── 6. Archive ──
