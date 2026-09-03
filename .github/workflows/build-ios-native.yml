@@ -160,7 +160,8 @@ jobs:
           mkdir -p "$PP_OLD" "$PP_NEW"
           cp "$RUNNER_TEMP/profile.mobileprovision" "$PP_OLD/$UUID.mobileprovision"
           cp "$RUNNER_TEMP/profile.mobileprovision" "$PP_NEW/$UUID.mobileprovision"
-          echo "profile UUID=$UUID 已装新路径"
+          echo "PROFILE_UUID=$UUID" >> "$GITHUB_ENV"
+          echo "profile UUID=$UUID 已装双路径"
 
       # ── 5. pod install（Podfile里全是本地:path依赖，不需要--repo-update拉Specs大仓）──
       - name: CocoaPods install
@@ -198,7 +199,8 @@ jobs:
             CURRENT_PROJECT_VERSION="$BUILD_NUMBER" \
             MARKETING_VERSION=2.0.0 \
             CODE_SIGN_STYLE=Manual \
-            PROVISIONING_PROFILE_SPECIFIER="$PROFILE_NAME" \
+            PROVISIONING_PROFILE="$PROFILE_UUID" \
+            PROVISIONING_PROFILE_SPECIFIER="$PROFILE_UUID" \
             CODE_SIGN_IDENTITY="Apple Distribution" \
             DEVELOPMENT_TEAM="$TEAM_ID" \
             > /tmp/archive.log 2>&1 || { echo '=== archive失败,最后80行 ==='; tail -80 /tmp/archive.log; exit 1; }
@@ -219,7 +221,7 @@ jobs:
             <key>teamID</key><string>${{ env.TEAM_ID }}</string>
             <key>provisioningProfiles</key>
             <dict>
-              <key>cn.qyai001.qiuyu</key><string>${{ env.PROFILE_NAME }}</string>
+              <key>cn.qyai001.qiuyu</key><string>${{ env.PROFILE_UUID }}</string>
             </dict>
           </dict>
           </plist>
