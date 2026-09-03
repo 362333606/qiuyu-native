@@ -1,0 +1,158 @@
+name: iOS Native Build (uni-app离线打包)
+
+on:
+  workflow_dispatch:
+
+env:
+  APPID: ${{ secrets.DCLOUD_APPID }}
+  APPKEY: ${{ secrets.DCLOUD_IOS_APPKEY }}
+  BUNDLE_ID: cn.qyai001.qiuyu
+  PROFILE_NAME: QiuYu AdHoc 20260903
+  TEAM_ID: ${{ secrets.APPLE_TEAM_ID }}
+
+jobs:
+  build:
+    name: 离线打包 AdHoc
+    runs-on: macos-26
+    timeout-minutes: 90
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      # ── 1. 编译 uni-app www 资源 ──
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '16'
+
+      - name: Build uni-app www
+        working-directory: app
+        run: |
+          npm install --legacy-peer-deps --no-audit --no-fund
+          rm -rf node_modules/@vue/component-compiler-utils
+          cp -r node_modules/@dcloudio/vue-cli-plugin-uni/packages/@vue/component-compiler-utils node_modules/@vue/component-compiler-utils
+          npm run build:app-plus
+          test -f dist/build/app-plus/app-service.js
+
+      # ── 2. 下载 iOS 离线 SDK (Release 资产) ──
+      - name: Download iOS SDK
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          gh release download native-sdk -R "$GITHUB_REPOSITORY" -p 'iOS-SDK*.zip' -O /tmp/iOS-SDK.zip
+          ls -la /tmp/iOS-SDK.zip
+          mkdir -p /tmp/sdk && cd /tmp/sdk
+          unzip -q /tmp/iOS-SDK.zip            # 外层: latest/5.25/SDK.zip
+          unzip -q latest/5.25/SDK.zip -d out  # 内层: SDK/, HBuilder-Hello/ ...
+          ls out/
+
+      # ── 3. 组装: www + control.xml + bundle id ──
+      - name: Assemble project
+        run: |
+          HB=/tmp/sdk/out/HBuilder-Hello
+          APP_DIR="$HB/HBuilder-Hello/Pandora/apps/$APPID"
+          # www 资源
+          rm -rf "$HB/HBuilder-Hello/Pandora/apps/__UNI__33C5XXX"
+          mkdir -p "$APP_DIR"
+          cp -R app/dist/build/app-plus/. "$APP_DIR/www/"
+          # control.xml: appid + appkey + 关debug
+          cat > "$HB/HBuilder-Hello/control.xml" <<XML
+          <?xml version="1.0" encoding="utf-8"?>
+          <HBuilder debug="false" version="5.25.2026082902">
+            <apps>
+              <app appid="$APPID" appver="2.0.0" appkey="$APPKEY"/>
+            </apps>
+          </HBuilder>
+          XML
+          # bundle id
+          python3 - <<'PY'
+          import re
+          p = '/tmp/sdk/out/HBuilder-Hello/HBuilder-Hello.xcodeproj/project.pbxproj'
+          c = open(p).read()
+          c = c.replace('com.dcloud.XXX', 'cn.qyai001.qiuyu').replace('io.dcloud.HBuilder', 'cn.qyai001.qiuyu')
+          open(p, 'w').write(c)
+          print('bundle id ok')
+          PY
+          # 显示名
+          plutil -replace CFBundleDisplayName -string "球域AI" "$HB/HBuilder-Hello/Info.plist" 2>/dev/null || true
+          plutil -replace CFBundleName -string "球域AI" "$HB/HBuilder-Hello/Info.plist" 2>/dev/null || true
+
+      # ── 4. 签名材料 ──
+      - name: Import certificate & profile
+        env:
+          P12_B64: ${{ secrets.APPLE_P12_B64 }}
+          P12_PWD: ${{ secrets.APPLE_P12_PASSWORD }}
+          PROFILE_B64: ${{ secrets.APPLE_PROFILE_ADHOC_B64 }}
+        run: |
+          CERT_PATH="$RUNNER_TEMP/build_cert.p12"
+          echo "$P12_B64" | base64 --decode > "$CERT_PATH"
+          security create-keychain -p temporary-build-keychain build.keychain-db
+          security import "$CERT_PATH" -k build.keychain-db -P "$P12_PWD" \
+            -T /usr/bin/codesign -T /usr/bin/security
+          security list-keychain -d user -s build.keychain-db
+          security set-key-partition-list -S apple-tool:,apple:,codesign: \
+            -k temporary-build-keychain build.keychain-db
+          PP_DIR="$HOME/Library/MobileDevice/Provisioning Profiles"
+          mkdir -p "$PP_DIR"
+          echo "$PROFILE_B64" | base64 --decode > "$RUNNER_TEMP/profile.mobileprovision"
+          UUID=$(security cms -D -i "$RUNNER_TEMP/profile.mobileprovision" | plutil -extract UUID raw -o - -)
+          cp "$RUNNER_TEMP/profile.mobileprovision" "$PP_DIR/$UUID.mobileprovision"
+          echo "profile UUID=$UUID"
+
+      # ── 5. pod install ──
+      - name: CocoaPods install
+        working-directory: /tmp/sdk/out/HBuilder-Hello
+        run: |
+          pod install --repo-update
+
+      # ── 6. Archive ──
+      - name: Archive (AdHoc)
+        env:
+          BUILD_NUMBER: ${{ github.run_number }}
+        run: |
+          set -o pipefail
+          cd /tmp/sdk/out/HBuilder-Hello
+          xcodebuild archive \
+            -workspace HBuilder-Hello.xcworkspace \
+            -scheme HBuilder \
+            -configuration Release \
+            -destination 'generic/platform=iOS' \
+            -archivePath "$RUNNER_TEMP/QiuYuAI.xcarchive" \
+            CURRENT_PROJECT_VERSION="$BUILD_NUMBER" \
+            MARKETING_VERSION=2.0.0 \
+            CODE_SIGN_STYLE=Manual \
+            PROVISIONING_PROFILE_SPECIFIER="$PROFILE_NAME" \
+            CODE_SIGN_IDENTITY="Apple Distribution" \
+            DEVELOPMENT_TEAM="$TEAM_ID" \
+            | grep -E "error|warning: |ARCHIVE" || true
+          test -d "$RUNNER_TEMP/QiuYuAI.xcarchive"
+
+      - name: Export IPA (ad-hoc)
+        run: |
+          cat > "$RUNNER_TEMP/ExportOptions.plist" <<PLIST
+          <?xml version="1.0" encoding="UTF-8"?>
+          <!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+          <plist version="1.0">
+          <dict>
+            <key>method</key><string>ad-hoc</string>
+            <key>signingCertificate</key><string>Apple Distribution</string>
+            <key>signingStyle</key><string>manual</string>
+            <key>teamID</key><string>${{ env.TEAM_ID }}</string>
+            <key>provisioningProfiles</key>
+            <dict>
+              <key>cn.qyai001.qiuyu</key><string>${{ env.PROFILE_NAME }}</string>
+            </dict>
+          </dict>
+          </plist>
+          PLIST
+          xcodebuild -exportArchive \
+            -archivePath "$RUNNER_TEMP/QiuYuAI.xcarchive" \
+            -exportPath "$RUNNER_TEMP/ipa" \
+            -exportOptionsPlist "$RUNNER_TEMP/ExportOptions.plist"
+          ls -la "$RUNNER_TEMP/ipa"
+
+      - name: Attach IPA artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: qiuyu-native-ipa-${{ github.run_number }}
+          path: ${{ runner.temp }}/ipa/*.ipa
+          retention-days: 30
