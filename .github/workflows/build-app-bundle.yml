@@ -1,0 +1,38 @@
+name: uni-app JS Bundle (iOS资源)
+
+on:
+  workflow_dispatch:
+  push:
+    branches: [main]
+
+jobs:
+  build:
+    name: build:app-plus
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '16'
+
+      - name: Install deps
+        run: npm install --legacy-peer-deps --no-audit --no-fund
+        working-directory: app
+
+      - name: Build app-plus bundle
+        run: npm run build:app-plus
+        working-directory: app
+        env:
+          UNI_CLI_CONTEXT: .
+
+      - name: Show output
+        run: ls -la app/dist/build/app-plus/ && du -sh app/dist/build/app-plus/
+
+      - name: Upload www artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: uniapp-www
+          path: app/dist/build/app-plus/
+          retention-days: 14
