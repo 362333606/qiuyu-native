@@ -1,0 +1,153 @@
+.container {
+    width: 100%;
+}
+.status-box {
+    width: 100%;
+    display: flex;
+	margin: 0 30rpx;
+    justify-content: space-between;
+    align-items: center;
+    background-color: #fff;
+	
+}
+.status-box .status-label {
+    height: 100%;
+	margin: 0rpx 60rpx;
+	padding: 10rpx 0;
+    text-align: center;
+    font-size: 28rpx;
+    color: #353535;
+    box-sizing: border-box;
+    position: relative;
+	border: 2rpx solid #f6f7fd;
+	border-radius: 40rpx;
+}
+.serve-name{
+	font-size: 20rpx;
+	margin-left: 20rpx;
+	background-color: #ccc;
+	border-radius: 30rpx;
+	padding: 4rpx 10rpx;
+	color: white;
+}
+
+.status-box .sub-width {
+    width: 50%;
+}
+
+.status-box .status-label.active {
+    border: 2rpx solid #88ccf1;
+}
+.no-order {
+    width: 100%;
+    position: absolute;
+    bottom: 0;
+    top: 88rpx;
+    left: 0;
+    right: 0;
+    text-align: center;
+    padding-top: 203rpx;
+    background-color: #f2f2f2;
+}
+.padding{
+	padding: 16rpx 20rpx;
+}
+.goods-content{
+	display: flex;
+	padding-bottom: 20rpx;
+	border-bottom: 2rpx solid #ccc;
+}
+.goods-img image {
+   width: 240rpx;
+   height: 120rpx;
+    flex-shrink: 0;
+	box-sizing: content-box;
+}
+.goods-info{
+	margin-left: 20rpx;
+	margin-top: 10rpx;
+}
+.goods-info image{
+	width: 30rpx;
+	height: 30rpx;
+	vertical-align: middle;
+	margin-right: 20rpx;
+}
+.goods-name{
+	font-weight: bolder;
+}
+.goods-time,.goods-address{
+	color: #999;
+	font-size: 22rpx;
+	margin-top: 16rpx;
+}
+
+
+.no-order-img {
+    width: 81rpx;
+    height: 96rpx;
+    margin-bottom: 31rpx;
+}
+.no-order .text {
+    font-size: 28rpx;
+    color: #999999;
+    text-align: center;
+}
+.order-list {
+    width: 100%;
+}
+.order-item {
+	padding: 30rpx;
+    background-color: #fff;
+    margin: 20rpx;
+	border: 0.5px solid #eee;
+	border-radius: 20rpx;
+}
+.order-item-disable {
+	box-shadow: none;
+}
+.order-item-click {
+	box-shadow: 0 4rpx 10rpx 0 rgba(0,0,0,0.1);
+}
+.cu-btn.sm{
+	height: 20px;
+	font-size: 10px;
+}
+.order-bottom{
+	display: flex;
+	align-items: center;
+	margin-top: 20rpx;
+}
+.order-add-time{
+	width: 50%;
+	color: #999999;
+}
+
+.price-box {
+	text-align: right;
+	width: 50%;
+}
+.price-box .btn {
+	padding: 10rpx 20rpx;
+	margin-left: 10rpx;
+    box-sizing: border-box;
+    text-align: center;
+    border-radius: 10rpx;
+    font-size: 24rpx;
+	background-color: #ccc;
+	color: white;
+}
+.price-box .active {
+    border: 1px solid #e64340;
+    color: #e64340;
+	
+}
+.price-box .okpay{
+	background-color: #88ccf1;
+}
+.remark {
+    color: #e64340;
+    margin-bottom: 20rpx;
+}
+
+

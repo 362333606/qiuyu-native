@@ -1,0 +1,41 @@
+page {
+}
+.header image{
+	width: 100%;
+	height: 140px;
+}
+.logo-bg{
+	width: 70px;
+	height: 70px;
+}
+.demand-item{
+	background-color: white;
+	padding: 30rpx;
+	border-radius: 4px;
+}
+.demand-title{
+	font-size: 30rpx;
+	font-weight: bolder;
+}
+.demand-item-title{
+	font-size: 30rpx;
+	font-weight: bolder;
+}
+.demand-info{
+	display: flex;
+	margin-top: 16rpx;
+}
+
+.raw-text-container {
+  /* 关键样式：保留所有空格和换行 */
+  white-space: pre-wrap;
+  
+  /* 可选样式：增强可读性 */
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  font-size: 18px;
+  line-height: 1.8;
+  padding: 12px;
+  background-image: url(/static/jiexi_bg.jpg);
+  border-radius: 8px;
+}
+

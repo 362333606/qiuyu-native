@@ -1,0 +1,272 @@
+{
+    "pages" : [
+		{
+		    "path" : "pages/chat/index",
+		    "style" : {
+		        "navigationBarTitleText" : "球域Ai",
+				"navigationStyle": "custom"
+		    }
+		},
+		{
+		    "path" : "pages/match/index",
+		    "style" : {
+		        "navigationBarTitleText" : "球域Ai",
+				"navigationStyle": "custom"
+		    }
+		},
+		{
+		    "path" : "pages/match/detail",
+		    "style" : {
+		        "navigationBarTitleText" : "赛事分析"
+		    }
+		},
+		{
+		    "path" : "pages/goal_match/index",
+		    "style" : {
+		        "navigationBarTitleText" : "超级精选赛事"
+		    }
+		},
+		{
+		    "path" : "pages/goal_match/detail",
+		    "style" : {
+		        "navigationBarTitleText" : "赛事分析"
+		    }
+		},
+		{
+		    "path" : "pages/chat/detail",
+		    "style" : {
+		        "navigationBarTitleText" : "解析结果"
+		    }
+		},
+        {
+            "path" : "pages/login/login",
+            "style" : {
+                "navigationBarTitleText" : "球域Ai",
+                "enablePullDownRefresh" : false,
+				"navigationStyle": "custom"
+            }
+        },
+		{
+			"path": "pages/login/index",
+			"style": {
+				"navigationStyle": "custom"
+			}
+		},
+		{
+		  "path": "pages/guide/alipay-guide",
+		  "style": {
+			"navigationBarTitleText": "支付宝支付引导",
+			"navigationStyle": "custom"
+		  }
+		},
+		{
+			"path": "pages/login/phone",
+			"style": {
+				"navigationStyle": "custom"
+			}
+		},
+        {
+            "path" : "pages/register/register",
+            "style" : {
+                "navigationBarTitleText" : "新用户注册",
+                "enablePullDownRefresh" : false,
+				"navigationStyle": "custom"
+            }
+        },
+		{
+			"path": "pages/recharge/index",
+			"style": {
+				"navigationBarTitleText": "充值中心"
+			}
+		},
+		{
+			"path": "pages/wallet/index",
+			"style": {
+				"navigationBarTitleText": "钱包",
+				"navigationBarBackgroundColor": "#151618",
+				"navigationBarTextStyle": "white",
+				"navigationStyle": "custom"
+			}
+		},
+		{
+			"path": "pages/news/index",
+			"style": {
+				"navigationBarTitleText": ""
+			}
+		},
+		{
+			"path": "pages/chat/auto",
+			"style": {
+				"navigationBarTitleText": ""
+			}
+		},
+		{
+		    "path" : "pages/agreement/privacy_policy",
+		    "style" : {
+		        "navigationBarTitleText" : "隐私政策",
+		        "enablePullDownRefresh" : false
+		    }
+		},
+		{
+		    "path" : "pages/agreement/serv_agreement",
+		    "style" : {
+		        "navigationBarTitleText" : "服务协议",
+		        "enablePullDownRefresh" : false
+		    }
+		},
+		{
+		    "path" : "pages/demand/list",
+		    "style" : {
+		        "navigationBarTitleText" : "解锁列表",
+		        "enablePullDownRefresh" : false
+		    }
+		},
+		{
+		    "path" : "pages/ai_expert/list",
+		    "style" : {
+		        "navigationBarTitleText" : "AI专家",
+		        "enablePullDownRefresh" : false
+		    }
+		},
+		{
+		    "path" : "pages/ai_expert/detail",
+		    "style" : {
+		        "navigationBarTitleText" : "AI专家详情",
+		        "enablePullDownRefresh" : false
+		    }
+		},
+		{
+		    "path" : "pages/ai_expert/matchDetail",
+		    "style" : {
+		        "navigationBarTitleText" : "赛事分析",
+		        "enablePullDownRefresh" : false
+		    }
+		},
+		{
+		    "path" : "pages/demand/payContent",
+		    "style" : {
+		        "navigationBarTitleText" : "解锁内容",
+		        "enablePullDownRefresh" : false
+		    }
+		},
+		{
+			"path": "pages/invite/index",
+			"style": {
+				"navigationBarTitleText": "邀请好友"
+			}
+		},
+		{
+			"path": "pages/invite/list",
+			"style": {
+				"navigationBarTitleText": "我推荐的朋友"
+			}
+		}
+    ],
+	"subPackages" : [
+		{
+		  "root": "TUIKit",
+		  "pages": [
+			{
+			  "path": "components/TUIConversation/index",
+			  "style": {
+				"navigationBarTitleText": "球域Ai互动"
+			  }
+			},
+			{
+			  "path": "components/TUIChat/index",
+			  "style": {
+				"navigationBarTitleText": "球域Ai互动",
+				"app-plus": {
+				  "softinputMode": "adjustResize",
+				  "titleNView": {
+					"buttons": [
+					  {
+						"type": "menu"
+					  }
+					]
+				  }
+				},
+				"h5": {
+				  "titleNView": {
+					"buttons": []
+				  }
+				}
+			  }
+			},
+			// 集成 chat 组件，必须配置该路径: 视频播放
+			{
+			  "path": "components/TUIChat/video-play",
+			  "style": {
+				"navigationBarTitleText": "球域Ai互动"
+			  }
+			},
+			{
+			  "path": "components/TUIChat/web-view",
+			  "style": {
+				"navigationBarTitleText": "球域Ai互动"
+			  }
+			},
+			{
+			  "path": "components/TUIContact/index",
+			  "style": {
+				"navigationBarTitleText": "球域Ai互动"
+			  }
+			},
+			{
+			  "path": "components/TUIGroup/index",
+			  "style": {
+				"navigationBarTitleText": "球域Ai互动"
+			  }
+			},
+			{
+			  "path": "components/TUISearch/index",
+			  "style": {
+				"navigationBarTitleText": "聊天记录"
+			  }
+			}
+		  ]
+		}
+	],
+	"preloadRule": {
+	    "pages/chat/index": {
+	      "network": "all",
+	      "packages": ["TUIKit"]
+	    }
+	  },
+    "globalStyle" : {
+        "navigationBarTextStyle" : "black",
+        "navigationBarTitleText" : "球域Ai",
+        "navigationBarBackgroundColor" : "#fff",
+        "backgroundColor" : "#fff"
+    },
+    "tabBar" : {
+        "color" : "#bfbfbf",
+        "selectedColor" : "#1296db",
+        "list" : [
+			{
+			    "text" : "AI专家",
+			    "pagePath" : "pages/ai_expert/list",
+			    "iconPath" : "static/bar/expert.png",
+			    "selectedIconPath" : "static/bar/expert-active.png"
+			},
+            {
+                "text" : "赛事",
+                "pagePath" : "pages/match/index",
+                "iconPath" : "static/bar/saishi.png",
+                "selectedIconPath" : "static/bar/saishi-active.png"
+            },
+            {
+                "text" : "球域AI",
+                "pagePath" : "pages/chat/index",
+                "iconPath" : "static/bar/ai.png",
+                "selectedIconPath" : "static/bar/ai-active.png"
+            },
+			{
+			    "text" : "我的",
+			    "pagePath" : "pages/wallet/index",
+			    "iconPath" : "static/bar/my.png",
+			    "selectedIconPath" : "static/bar/my-active.png"
+			}
+        ]
+    }
+}

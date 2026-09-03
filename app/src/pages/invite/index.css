@@ -1,0 +1,36 @@
+page {
+    background-color: white;
+}
+.container {
+    width: 100%;
+}
+.invite-content{
+	position: fixed;
+	top: 50%;
+	display: flex;
+	align-items: center;
+	margin-left: 60rpx;
+}
+.invite-text{
+	padding: 20rpx 30rpx;
+	background-color: white;
+	font-size: 34rpx;
+	border-radius: 40rpx;
+	margin-left: 30rpx;
+}
+.invite-list{
+	margin-left: 30rpx;
+	margin-top: 40rpx;
+	font-size: 32rpx;
+	text-align: center;
+	text-decoration:underline;
+}
+image{
+	position: absolute;
+	left: 0;
+	bottom: 0;
+	display: block;
+	width: 100%;
+	height: 100%;
+	z-index: -999;
+}

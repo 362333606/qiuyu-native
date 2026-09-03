@@ -1,0 +1,174 @@
+@import url("../../style.less");
+page {
+  background-color: #f4f4f4;
+}
+.page{
+	background-color: #f4f4f4;
+}
+/* 1. 外层滚动容器：限制宽度，超出显示横向滚动条 */
+.date-scroll-container {
+  background-color: white;
+ 
+  width: 100%; /* 可根据实际需求调整（如300px、50vw），限制容器宽度才会出现滚动 */
+  overflow-x: auto; /* 横向超出时显示滚动条，支持滑动 */
+  overflow-y: hidden; /* 隐藏纵向滚动条（避免多余空间） */
+  -webkit-overflow-scrolling: touch; /* 优化移动端滑动体验（顺滑不卡顿） */
+}
+/* 消除滚动时的边缘视觉差异 */
+.date-scroll-container::-webkit-scrollbar {
+  height: 0; /* 隐藏滚动条，可选 */
+}
+.date-list{
+	font-size: 14px;
+	padding: 20rpx;
+	display: flex;
+	// justify-content: flex-end;
+	white-space: nowrap; /* 元素不换行 */
+	min-width: max-content;
+	
+}
+.date-active{
+	font-size: 16px;
+	color: #1296db;
+	// font-weight: bolder;
+	padding-bottom: 6px;
+	border-bottom: 4px solid #1296db;
+}
+.date-item{
+	margin-left: 20rpx;
+	margin-right: 20rpx;
+	font-size: 30rpx;
+	flex: 1;
+	text-align: center;
+}
+
+.game-total{
+	padding: 15rpx 10rpx;
+	font-size: 28rpx;
+	text-align: right;
+	color: #666666;
+	display: flex;
+}
+.game-total view {
+	flex: 1;
+}
+.game-content{
+	margin: 10rpx;
+}
+.game-item{
+	background-color: #fff;
+	padding: 15rpx;
+	margin-bottom: 15rpx;
+	border-radius: 10rpx;
+}
+.game-league{
+	font-size: 22rpx;
+	background-color: #1296db;
+	width: 100rpx;
+	color: white;
+	padding: 2rpx 40rpx;
+	text-align: center;
+	border-radius: 6rpx;
+}
+.game-info{
+	float: right;
+	margin-left: 10rpx;
+	font-size: 20rpx;
+	padding: 0rpx 10rpx;
+	border: 1rpx solid black;
+	border-radius: 30rpx;
+}
+.game-item-content{
+	display: flex;
+	align-items: center;
+	text-align: center;
+	font-size: 30rpx;
+	margin-top: 10rpx;
+}
+.game-team{
+	width: 25%;
+	image{
+		width: 50rpx;
+		height: 50rpx;
+	}
+}
+.game-time{
+	font-size: 26rpx;
+	width: 35%;
+}
+.game-date{
+	color: #aeaeae;
+}
+.game-option{
+	width: 15%;
+}
+.game-vs{
+	line-height: 60rpx;
+	font-size: 30rpx;
+}
+.game-fx{
+	line-height: 60rpx;
+	color: #aeaeae;
+	font-size: 24rpx;
+}
+.game-btn{
+	background-color: #abedd8;
+	padding: 4rpx 10rpx;
+	border-radius: 6rpx;
+	font-size: 26rpx;
+}
+.cate-list{
+	margin-top: 20rpx;
+	display: flex;
+	text-align: center;
+	justify-content: center;
+}
+.cate-item{
+	padding: 10rpx 25rpx;
+	border-radius: 10rpx;
+}
+.cate-item-active{
+	background-color: red;
+	color: white;
+}
+
+.notice-popup-content{
+	padding: 40rpx;
+	width: 300px;
+	height: 170px;
+	border-radius: 20rpx;
+	background-color: white;
+}
+.pay-notice-content{
+	padding: 30rpx;
+	text-align: center;
+}
+.notice-option{
+	display: flex;
+	gap: 40rpx;
+}
+.notice-option-item{
+	flex: 1;
+	border-radius: 40rpx;
+	color: white;
+	padding: 20rpx;
+	font-size: 30rpx;
+	text-align: center;
+	margin-top: 40rpx;
+}
+.menu-content{
+	width: 100%;
+	align-items: center;
+}
+.menu-option{
+	flex: 1;
+	margin-top: 11px;
+	text-align: center;
+}
+.all-pay{
+	background-color: red;
+	color: white;
+	margin-right: 20rpx;
+	border-radius: 6rpx;
+	padding: 4px 10px;
+}

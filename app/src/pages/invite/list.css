@@ -1,0 +1,40 @@
+page {
+    background-color: white;
+}
+
+.container {
+    width: 100%;
+}
+.partner-container{
+	margin: 30rpx;
+}
+.invite-item{
+	box-shadow: 0 0 5px rgba(0,0,0,.1);
+	border-radius: 20rpx;
+	padding: 30rpx;
+	display: flex;
+	align-items: center;
+	margin-bottom: 30rpx;
+}
+.user-info{
+	width: 60%;
+	margin-left: 20rpx;
+}
+.user-price{
+	color: #ccc;
+	font-size: 32rpx;
+}
+.user-info text{
+	font-size: 20rpx;
+	color: #ccc;
+	margin-top: 10rpx;
+}
+.user-logo image{
+	width: 70rpx;
+	height: 70rpx;
+	border-radius: 50%;
+}
+.no-more-goods{
+	text-align: center;
+	margin-top: 100rpx;
+}

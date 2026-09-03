@@ -1,0 +1,65 @@
+page {
+    /* background-color: white; */
+}
+
+.container {
+    width: 100%;
+}
+.recharge-container{
+	box-shadow: 0 0 5px rgba(0,0,0,.2);
+	padding: 40rpx;
+	margin-top: 10rpx;
+	border-radius: 40rpx;
+	background:linear-gradient(to top,white, #b2c6dd);
+}
+.recharge-head{
+	font-size: 34rpx;
+	font-weight: bolder;
+}
+.recharge-list{
+	display: flex;
+	flex-wrap: wrap;
+	margin: 60rpx 0;
+}
+.recharge-item{
+	width: 30%;
+	background-color: #e1eaff;
+	text-align: center;
+	margin: 10rpx 10rpx 30rpx 10rpx;
+	height: 90rpx;
+	border-radius: 10rpx;
+	font-size: 30rpx;
+}
+.recharge-give-price{
+	font-size: 30rpx;
+}
+.recharge-price{
+	margin-top: 10rpx;
+	font-size: 50rpx;
+	font-weight: bolder;
+}
+.recharge-btn{
+	background-color: #385dd6;
+	border-radius: 40rpx;
+	color: white;
+	padding: 20rpx;
+	font-size: 30rpx;
+	font-weight: bolder;
+	text-align: center;
+	margin-top: 60rpx;
+}
+.recharge-desc{
+	font-size: 30rpx;
+	text-align: center;
+	margin-top: 50rpx;
+	color: #9c9d9d;
+}
+
+.active{
+	background-color: #385dd6;
+	color: white;
+}
+.default{
+	background-color: #e1eaff;
+	color: #385dd6;
+}

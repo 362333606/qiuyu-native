@@ -1,0 +1,346 @@
+@import url("../../style.less");
+page {
+  background-color: #e3eff9;
+}
+.page{
+	background-color: #e3eff9;
+}
+/* 1. 外层滚动容器：限制宽度，超出显示横向滚动条 */
+.date-scroll-container {
+  width: 100%; /* 可根据实际需求调整（如300px、50vw），限制容器宽度才会出现滚动 */
+  overflow-x: auto; /* 横向超出时显示滚动条，支持滑动 */
+  overflow-y: hidden; /* 隐藏纵向滚动条（避免多余空间） */
+  -webkit-overflow-scrolling: touch; /* 优化移动端滑动体验（顺滑不卡顿） */
+}
+/* 消除滚动时的边缘视觉差异 */
+.date-scroll-container::-webkit-scrollbar {
+  height: 0; /* 隐藏滚动条，可选 */
+}
+.top-content{
+	display: flex;
+	padding: 20rpx 20rpx 10rpx 20rpx;
+	align-items: center;
+	gap: 10px;
+}
+.top-content view{
+	flex: 1;
+}
+.logo-item image{
+	width: 10px;
+	height: 10px;
+}
+.top-content-left{
+	display: flex;
+	align-items: center;
+	gap: 10px;
+}
+.date-list{
+	font-size: 14px;
+	padding: 15rpx;
+	border: 1px solid #cddeec;
+	background-color: #fff;
+	border-radius: 30rpx;
+	margin: 0px 20rpx;
+	display: flex;
+	// justify-content: flex-end;
+	white-space: nowrap; /* 元素不换行 */
+	min-width: max-content;
+	
+}
+.date-active{
+	font-size: 16px;
+	color: #fff;
+	// font-weight: bolder;
+	padding-bottom: 6px;
+	border-bottom: 4px solid #1296db;
+	background-color: #0b9bde;
+}
+.date-week-active{
+	color: #fff;
+}
+.date-week-noactive{
+	color: #aeaeae;
+}
+.date-item{
+	font-size: 32rpx;
+	font-weight: 500;
+	flex: 1;
+	text-align: center;
+	border: 1px solid #e5eaee;
+	border-radius: 20rpx;
+	padding: 12px 0px;
+}
+.date-item-week {
+	font-size: 26rpx;
+	margin-bottom: 10rpx;
+}
+
+.game-total{
+	padding: 20rpx;
+	font-size: 28rpx;
+	text-align: right;
+	color: #666666;
+	display: flex;
+	margin-top: 10rpx;
+}
+.game-total view {
+	flex: 1;
+}
+.game-total-num{
+	font-size: 34rpx;
+	font-weight: bolder;
+	margin-left: 5px;
+	margin-right: 5px;
+	color: #000;
+}
+.game-total-text{
+	background-color: #ecfef6;
+	color: #0c9f71;
+	padding: 8rpx 24rpx;
+	border: 1px solid #0c9f71;
+	border-radius: 30rpx;
+	font-size: 24rpx;
+}
+.game-total-text-point{
+	display:inline-block; 
+	background-color: #0c9f71;
+	width: 8px;
+	height: 8px;
+	border-radius: 50%;
+	margin-right: 10rpx;
+}
+
+.game-content{
+	margin: 10rpx 20rpx 20rpx 20rpx;
+}
+
+.game-item{
+	background-color: #fff;
+	padding: 30rpx;
+	margin-bottom: 20rpx;
+	border-radius: 30rpx;
+}
+.game-league{
+	font-size: 22rpx;
+	background-color: #e0f2fa;
+	width: 100rpx;
+	color: #0b9bde;
+	padding: 10rpx 20rpx;
+	text-align: center;
+	border-radius: 30rpx;
+	border: 1px solid #9fc3d8;
+}
+.game-cjhx-tag{
+	font-size: 22rpx;
+	background-color: #f8a011;
+	width: 100rpx;
+	color: #fff;
+	padding: 10rpx 20rpx;
+	text-align: center;
+	border-radius: 30rpx;
+}
+.game-result-tag{
+	font-size: 22rpx;
+	width: 100rpx;
+	color: #fff;
+	padding: 10rpx 20rpx;
+	text-align: center;
+	border-radius: 30rpx;
+}
+.game-result-success{
+	background-color: #10a977;
+}
+.game-result-error{
+	background-color: #e93634;
+}
+.game-result-he{
+	background-color: #f2f4fa;
+}
+.game-info{
+	margin-left: 10rpx;
+	font-size: 20rpx;
+	padding: 10rpx 20rpx;
+	border: 1px solid #9fc3d8;
+	border-radius: 30rpx;
+	color: #0b9bde;
+	background-color: #e0f2fa;
+}
+.game-item-content{
+	display: flex;
+	align-items: center;
+	text-align: center;
+	font-size: 30rpx;
+	margin-top: 10rpx;
+	margin-bottom: 30rpx;
+	padding: 40rpx 20rpx;
+	border-bottom: 1px solid #f4f6fc;
+}
+.game-item-content view{
+	flex: 1;
+}
+.game-item-title-right{
+	float: right;
+}
+.game-item-title-right text{
+	margin-left: 5px;
+}
+.game-team{
+	font-size: 32rpx;
+	font-weight: bolder;
+	image{
+		width: 50rpx;
+		height: 50rpx;
+	}
+}
+
+.game-date{
+	color: #aeaeae;
+}
+.game-date image{
+	width: 36rpx;
+	height: 36rpx;
+	vertical-align: sub;
+	margin-right: 10rpx;
+}
+.game-option{
+}
+.game-vs{
+	font-size: 30rpx;
+	font-weight: bolder;
+}
+.game-item-vs{
+	background-color: #f2f4fa;
+	padding: 20rpx;
+	border: 1px solid #e4e9f0;
+	color: #9aa1b5;
+	border-radius: 50%;
+}
+.game-fx{
+	line-height: 60rpx;
+	color: #aeaeae;
+	font-size: 24rpx;
+}
+.game-btn{
+	padding: 18rpx 30rpx;
+	border-radius: 20rpx;
+	font-size: 30rpx;
+	float: right;
+	color: white;
+}
+.game-item-bottom{
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  width: 100%;
+}
+.game-item-bottom view{
+	flex: 1;
+}
+
+.cate-list{
+	margin-top: 20rpx;
+	display: flex;
+	text-align: center;
+	justify-content: center;
+	gap: 20rpx; 
+}
+.cate-item{
+	padding: 15rpx 20rpx;
+	border-radius: 40rpx;
+	background-color: #fff;
+	color: #77858e;
+}
+.cate-item-active{
+	background-color: #0b9bde;
+	color: white;
+}
+
+.notice-popup-content{
+	padding: 40rpx;
+	width: 300px;
+	height: 170px;
+	border-radius: 20rpx;
+	background-color: white;
+}
+.pay-notice-content{
+	padding: 30rpx;
+	text-align: center;
+}
+.notice-option{
+	display: flex;
+	gap: 40rpx;
+}
+.notice-option-item{
+	flex: 1;
+	border-radius: 40rpx;
+	color: white;
+	padding: 20rpx;
+	font-size: 30rpx;
+	text-align: center;
+	margin-top: 40rpx;
+}
+.menu-content{
+	// display: flex;
+	width: 100%;
+	align-items: center;
+}
+.menu-option{
+	flex: 1;
+	margin-top: 11px;
+	text-align: center;
+}
+.all-pay{
+	background-color: red;
+	color: white;
+	margin-right: 20rpx;
+	border-radius: 6rpx;
+	padding: 4px 10px;
+}
+
+/* 外层容器 */
+.circle-progress {
+  position: relative;
+  width: 100rpx;
+  height: 100rpx;
+  float: right;
+}
+
+/* 灰色背景圆环 */
+.circle-bg {
+  position: absolute;
+  width: 100%;
+  height: 100%;
+  border-radius: 50%;
+  border: 12rpx solid #e3e6ed;
+  box-sizing: border-box;
+}
+
+/* 公共圆环样式 */
+.circle-left,
+.circle-right {
+  position: absolute;
+  width: 100%;
+  height: 100%;
+  border-radius: 50%;
+  border: 12rpx solid #0b9bde; /* 你的主题绿色 */
+  box-sizing: border-box;
+  clip: rect(0, 120rpx, 120rpx, 60rpx);
+  transition: transform 0.6s ease;
+}
+
+/* 左侧圆环（覆盖右半圆） */
+.circle-left {
+  clip: rect(0, 60rpx, 120rpx, 0);
+}
+
+/* 中间文字 */
+.progress-text {
+  position: absolute;
+  top: 60%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  font-size: 22rpx;
+  font-weight: bolder;
+  color: #0b9bde;
+  text-align: center;
+}

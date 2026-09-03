@@ -1,0 +1,10 @@
+@import '../../template/login/index.css';
+
+page {
+    background-color: #fff;
+}
+
+.container {
+    min-height: 100%;
+    padding-bottom: 100rpx;
+}

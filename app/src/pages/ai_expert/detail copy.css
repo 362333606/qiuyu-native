@@ -1,0 +1,130 @@
+.container {
+    width: 100%;
+}
+page {
+  background-color: white;
+}
+.page{
+	background-color: white;
+	padding: 30rpx;
+}
+.no-order {
+    width: 100%;
+    position: absolute;
+    bottom: 0;
+    top: 88rpx;
+    left: 0;
+    right: 0;
+    text-align: center;
+    padding-top: 203rpx;
+    background-color: #f2f2f2;
+}
+.padding{
+	padding: 16rpx 20rpx;
+}
+.match-list{
+	margin-top: 40rpx;
+}
+.match-item{
+	padding: 30rpx;
+	background-color: white;
+	border-radius: 20rpx;
+	margin-bottom: 20rpx;
+	box-shadow: 0 4rpx 10rpx 0 rgba(0,0,0,0.3);
+}
+.match-title{
+	display: flex;
+	align-items: center;
+	color: #989ea5;
+}
+.match-title view {
+	flex: 1;
+}
+.match-info{
+	display: flex;
+	align-items: center;
+	text-align: center;
+	margin-top: 30rpx;
+}
+.match-info view{
+	flex: 1;
+}
+.match-info image{
+	width: 60rpx;
+	height: 60rpx;
+}
+.match-name{
+	font-weight: bolder;
+	margin-top: 10rpx;
+}
+.match-tag{
+	color: #4792dc;
+	padding: 10rpx 15rpx;
+	margin-right: 20rpx;
+	border-radius: 10rpx;
+	background-color: #e2f3fc;
+	font-size: 28rpx;
+}
+.match-reason{
+	background-color: #fafafa;
+	border-radius: 20rpx;
+	padding: 20rpx;
+	color: #989ea5;
+	margin-top: 20rpx;
+}
+.expert-stat{
+	background-color: #fafafa;
+	padding: 30rpx;
+	border-radius: 20rpx;
+	display: flex;
+	margin-bottom: 40rpx;
+}
+.expert-stat view {
+	flex: 1;
+	text-align: center;
+}
+.expert-stat text{
+	color: #378c3a;
+	font-weight: bolder;
+	font-size: 40rpx;
+}
+.expert-stat-item view{
+	margin-top: 10rpx;
+	color: #989ea5;
+	font-size: 30rpx;
+}
+.match-btn{
+	text-align: center;
+	margin-top: 40rpx;
+	margin-bottom: 20rpx;
+}
+.match-lock-btn{
+	background-color: #e2f3fc;
+	padding: 14rpx 40rpx;
+	border-radius: 50rpx;
+	color: #4792dc;
+}
+.notice-popup-content{
+	padding: 40rpx;
+	width: 300px;
+	height: 170px;
+	border-radius: 20rpx;
+	background-color: white;
+}
+.pay-notice-content{
+	padding: 30rpx;
+	text-align: center;
+}
+.notice-option{
+	display: flex;
+	gap: 40rpx;
+}
+.notice-option-item{
+	flex: 1;
+	border-radius: 40rpx;
+	color: white;
+	padding: 20rpx;
+	font-size: 30rpx;
+	text-align: center;
+	margin-top: 40rpx;
+}
