@@ -7,7 +7,10 @@ const app = new Vue({
     ...App
 })
 app.$mount()
-// vue 2.7 内置 composition-api（TUIKit 要求），不再需要 @vue/composition-api 插件
+// #ifndef VUE3
+import VueCompositionAPI from '@vue/composition-api';
+Vue.use(VueCompositionAPI);
+// #endif
 Vue.prototype.ossUrl = "https://oss.bestpw.cn/"
 Vue.prototype.uploadUrl = "https://qyai001.cn/api"
 var API_BASE_URL = 'https://qyai001.cn/api';

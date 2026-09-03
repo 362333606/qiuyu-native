@@ -16,8 +16,9 @@
     "@tencentcloud/tui-core": "^2.3.6",
     "tim-js-sdk": "^2.27.6",
     "tslib": "^2.4.0",
-    "vue": "^2.7.16",
-    "vuex": "^3.6.2"
+    "vue": "^2.6.14",
+    "vuex": "^3.6.2",
+    "@vue/composition-api": "^1.7.1"
   },
   "devDependencies": {
     "@dcloudio/types": "^3.4.8",
@@ -43,6 +44,7 @@
     "thread-loader": "^2.1.3",
     "typescript": "^4.9.5",
     "url-loader": "^2.3.0",
-    "vue-template-compiler": "^2.7.16"
+    "vue-template-compiler": "^2.6.14",
+    "unplugin-vue2-script-setup": "^0.11.3"
   }
 }
