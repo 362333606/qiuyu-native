@@ -21,6 +21,13 @@ jobs:
         run: npm install --legacy-peer-deps --no-audit --no-fund
         working-directory: app
 
+      - name: 用uni魔改版component-compiler-utils替换npm官方版
+        run: |
+          rm -rf node_modules/@vue/component-compiler-utils
+          cp -r node_modules/@dcloudio/vue-cli-plugin-uni/packages/@vue/component-compiler-utils node_modules/@vue/component-compiler-utils
+          grep '"version"' node_modules/@vue/component-compiler-utils/package.json
+        working-directory: app
+
       - name: Build app-plus bundle
         run: npm run build:app-plus
         working-directory: app
