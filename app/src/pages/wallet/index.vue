@@ -81,6 +81,11 @@
 		</view>
 
 	<view class="show-popup" v-if="isPay">
+		<!-- 退出登录(2026-09-04 v2.1.6):APP需要可退出换号;公众号时代无此设计 -->
+		<view v-if="isLogin" style="margin: 40rpx 5%; padding: 26rpx 0; text-align: center; background: #fff; border-radius: 20rpx;" @tap="toLogout">
+			<text style="color: #e5433c; font-size: 30rpx;">退出登录</text>
+		</view>
+
 		<view class="popup-mask" @click="closePay"></view>
 		<view class="popup-contents">
 			<payment @toCancel="closePay" @okPay="okPay" :payTypeId="2" :payOrderId="payOrderId" :payAmount="payAmount"></payment>
@@ -160,6 +165,22 @@ export default {
 			// #ifdef APP-PLUS
 			uni.showToast({icon:'none', title:'您已在APP内'})
 			// #endif
+		},
+		toLogout:function(){
+			uni.showModal({
+				title: '退出登录',
+				content: '确定退出当前账号？',
+				success: (m) => {
+					if (!m.confirm) return;
+					try { uni.removeStorageSync('wanju_token'); uni.removeStorageSync('wanju_nickName'); uni.removeStorageSync('wanju_avatarUrl'); } catch(e){}
+					// #ifdef APP-PLUS
+					plus.storage.removeItem('unlocked_'); // 不存在也无害
+					// #endif
+					this.isLogin = false;
+					this.balance = 0;
+					uni.showToast({icon:'none', title:'已退出'});
+				}
+			});
 		},
 		toLogin:function(){
 			this.isWeiXinLogin() ? window.location.href = "/#/pages/login/index" : uni.navigateTo({url: "/pages/login/login"})

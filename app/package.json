@@ -1,6 +1,6 @@
 {
   "name": "qiuyu-native-app",
-  "version": "2.1.5",
+  "version": "2.1.6",
   "private": true,
   "scripts": {
     "build:app-plus": "cross-env UNI_CLI_CONTEXT=. NODE_ENV=production UNI_PLATFORM=app-plus vue-cli-service uni-build",
