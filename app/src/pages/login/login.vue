@@ -84,6 +84,20 @@
 			<view class="dlbutton" hover-class="dlbutton-hover" @tap="bindLogin()">
 				<text>登录</text>
 			</view>
+			<view style="margin-top: 22px; text-align: center;">
+				<text style="color: #6ea2ff; font-size: 30rpx;" @tap="wxQrLogin">—— 微信扫码登录（推荐）——</text>
+			</view>
+		</view>
+
+		<!-- 微信扫码登录弹窗(2026-09-04 v2.1.4 妹妹): 老用户扫码自动登入公众号原账号 -->
+		<view v-if="showWxQr" style="position: fixed; left:0; top:0; right:0; bottom:0; background: rgba(0,0,0,.75); z-index: 9999; display: flex; align-items: center; justify-content: center;" @tap="closeWxQr">
+			<view style="background: #fff; border-radius: 18px; padding: 30px 26px; width: 78%; text-align: center;" @tap.stop="">
+				<text style="font-size: 17px; font-weight: 700; color: #07C160;">微信扫码登录</text>
+				<image v-if="wxQrUrl" :src="wxQrUrl" mode="aspectFit" style="width: 220px; height: 220px; margin: 16px auto; display: block; background: #f5f5f5; border-radius: 8px;"></image>
+				<text style="font-size: 13px; color: #666; display: block; line-height: 1.8;">请用微信「扫一扫」扫描上方二维码{{ wxWaiting ? '，等待确认…' : '' }}</text>
+				<text style="font-size: 11px; color: #999; display: block; margin-top: 8px;">扫码后自动登录公众号内的原账号</text>
+				<text style="font-size: 13px; color: #6ea2ff; display: block; margin-top: 14px;" @tap="closeWxQr">取消</text>
+			</view>
 		</view>
 		
 		<view class="recharge-desc">
@@ -115,14 +129,61 @@
 		onShow(){
 			var that = this
 		},
+		onUnload() {
+			this.closeWxQr();
+		},
 		data() {
 			return {
 				phoneno:'',
 				password:'',
-				checkboxMark: false
+				checkboxMark: false,
+				showWxQr: false,
+				wxQrUrl: '',
+				wxWaiting: false,
+				wxScene: '',
+				wxTimer: null
 			};
 		},
 		methods: {
+			// ===== 微信扫码登录(v2.1.4) =====
+			wxQrLogin() {
+				if (this.showWxQr) return;
+				uni.showLoading({ title: '获取二维码...' });
+				uni.request({
+					url: 'https://qyai001.cn/wxlogin/qrcode',
+					method: 'POST',
+					success: (res) => {
+						uni.hideLoading();
+						const d = res.data || {};
+						if (d.code !== 200) return uni.showToast({ icon: 'none', title: '二维码获取失败:' + (d.msg || '') });
+						this.wxScene = d.scene; this.wxQrUrl = d.qrcodeUrl;
+						this.showWxQr = true; this.wxWaiting = true;
+						this.wxTimer = setInterval(() => this.pollWx(), 2000);
+					},
+					fail: () => { uni.hideLoading(); uni.showToast({ icon: 'none', title: '网络异常' }); }
+				});
+			},
+			pollWx() {
+				uni.request({
+					url: 'https://qyai001.cn/wxlogin/poll?scene=' + this.wxScene,
+					success: (res) => {
+						const d = res.data || {};
+						if (d.code === 200) {
+							this.closeWxQr();
+							uni.setStorageSync('wanju_token', d.token);
+							uni.showToast({ icon: 'success', title: '登录成功' });
+							setTimeout(() => uni.switchTab({ url: '/pages/qa/index' }), 900);
+						} else if (d.code === 404) {
+							this.closeWxQr();
+							uni.showToast({ icon: 'none', title: '二维码已过期，请重试' });
+						}
+					}
+				});
+			},
+			closeWxQr() {
+				this.showWxQr = false; this.wxWaiting = false;
+				if (this.wxTimer) { clearInterval(this.wxTimer); this.wxTimer = null; }
+			},
 			changeChecked(){
 				this.checkboxMark = !this.checkboxMark;
 			},
