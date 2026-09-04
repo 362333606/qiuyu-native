@@ -73,7 +73,7 @@ jobs:
           <?xml version="1.0" encoding="utf-8"?>
           <HBuilder debug="false" version="5.25.2026082902">
             <apps>
-              <app appid="$APPID" appver="2.0.0" appkey="$APPKEY"/>
+              <app appid="$APPID" appver="2.1.0" appkey="$APPKEY"/>
             </apps>
           </HBuilder>
           XML
@@ -147,6 +147,9 @@ jobs:
           # 显示名（demo的plist名是HBuilder-Hello-Info.plist）
           plutil -replace CFBundleDisplayName -string "球域AI" "$APP_ROOT/HBuilder-Hello-Info.plist"
           plutil -replace CFBundleName -string "球域AI" "$APP_ROOT/HBuilder-Hello-Info.plist"
+          # 本地化显示名——zh-Hans.lproj/InfoPlist.strings里demo默认"HBuilder 你好"会覆盖Info.plist(张总手机中文系统实测显示hbuilder你好),必须一并改写
+          printf '/* Localized versions of Info.plist keys */\nCFBundleDisplayName="球域AI";\n' > "$APP_ROOT/zh-Hans.lproj/InfoPlist.strings"
+          printf '/* Localized versions of Info.plist keys */\nCFBundleDisplayName="球域AI";\n' > "$APP_ROOT/en.lproj/InfoPlist.strings"
 
       # ── 4. 签名材料 ──
       - name: Import certificate & profile
@@ -208,7 +211,7 @@ jobs:
             -destination 'generic/platform=iOS' \
             -archivePath "$RUNNER_TEMP/QiuYuAI.xcarchive" \
             CURRENT_PROJECT_VERSION="$BUILD_NUMBER" \
-            MARKETING_VERSION=2.0.0 \
+            MARKETING_VERSION=2.1.0 \
             CODE_SIGN_STYLE=Manual \
             PROVISIONING_PROFILE="$PROFILE_UUID" \
             PROVISIONING_PROFILE_SPECIFIER="$PROFILE_UUID" \
