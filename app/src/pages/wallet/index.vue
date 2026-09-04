@@ -154,18 +154,28 @@ export default {
 	},
     methods: {
 		toDownload: function(){
+			// #ifdef H5
 			window.location.href = "/app"
+			// #endif
+			// #ifdef APP-PLUS
+			uni.showToast({icon:'none', title:'您已在APP内'})
+			// #endif
 		},
 		toLogin:function(){
 			this.isWeiXinLogin() ? window.location.href = "/#/pages/login/index" : uni.navigateTo({url: "/pages/login/login"})
 		},
 		isWeiXinLogin() {
+		    // #ifdef H5
 		    var ua = window.navigator.userAgent.toLowerCase();
 		    if (ua.match(/MicroMessenger/i) == 'micromessenger') {
 		        return true; // 微信中打开
 		    } else {
 		        return false; // 普通浏览器中打开
 		    }
+		    // #endif
+		    // #ifndef H5
+		    return false; // APP端永远非微信环境(逻辑层无window)
+		    // #endif
 		},
 		toPaidList:function(){
 			if (!this.isLogin) {
@@ -226,7 +236,12 @@ export default {
 		tapNav(e) {
 		    const url = e.currentTarget.dataset.url;
 			if (url.includes("http")) {
+				// #ifdef H5
 				window.location.href = url;
+				// #endif
+				// #ifdef APP-PLUS
+				plus.runtime.openURL(url);
+				// #endif
 			} else {
 				uni.navigateTo({
 				    url: url
