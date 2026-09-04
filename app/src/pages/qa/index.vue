@@ -12,11 +12,8 @@ export default {
 	data() {
 		return {
 			qaUrl: 'https://qyai001.cn/qa/',
-			wvStyles: {
-				progress: {
-					color: '#2f7dcb'
-				}
-			}
+			// 20260904 v2.1.2 张总嫌顶部网页进度条存在感太强→去掉(加载期由原生导航栏顶着)
+			wvStyles: {}
 		}
 	}
 }
