@@ -29,7 +29,7 @@ echo "════ [3/5] 本机中转ipa ════"
 sshpass -p 'zxc986111.' scp -o StrictHostKeyChecking=no ubuntu@118.24.135.162:/tmp/qiuyu-ipa/*.ipa /tmp/qiuyu-native.ipa
 ls -la /tmp/qiuyu-native.ipa
 
-echo "════ [4/5] 119部署: 备份旧包→替换→版本号2.0.0 ════"
+echo "════ [4/5] 119部署: 备份旧包→替换→版本号2.1.0 ════"
 sshpass -p 'zxc986111.' ssh -o StrictHostKeyChecking=no ubuntu@119.29.4.24 '
 mkdir -p /home/ubuntu/ipa-backup
 cp /var/www/qiuyu-app/QiuYuAI.ipa /home/ubuntu/ipa-backup/QiuYuAI-v1shell-$(date +%m%d%H%M).ipa 2>/dev/null || echo "(无旧包)"
@@ -38,7 +38,15 @@ cp /var/www/qiuyu-app/manifest.plist /home/ubuntu/ipa-backup/manifest-$(date +%m
 sshpass -p 'zxc986111.' scp -o StrictHostKeyChecking=no /tmp/qiuyu-native.ipa ubuntu@119.29.4.24:/tmp/QiuYuAI-new.ipa
 sshpass -p 'zxc986111.' ssh -o StrictHostKeyChecking=no ubuntu@119.29.4.24 '
 sudo cp /tmp/QiuYuAI-new.ipa /var/www/qiuyu-app/QiuYuAI.ipa
-sudo sed -i "s|<string>1.0.2</string>|<string>2.0.0</string>|" /var/www/qiuyu-app/manifest.plist
+# 版本号写manifest bundle-version(正则只匹配bundle-version后的值,不误伤其他string;旧sed写死1.0.2→2.0.0已失配)
+sudo python3 -c "
+import re
+p='/var/www/qiuyu-app/manifest.plist'
+c=open(p).read()
+c=re.sub(r'(<key>bundle-version</key>\s*<string>)[^<]+(</string>)', r'\g<1>2.1.0\g<2>', c)
+open(p,'w').write(c)
+print('bundle-version -> 2.1.0')
+"
 ls -la /var/www/qiuyu-app/
 '
 
