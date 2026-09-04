@@ -22,6 +22,10 @@
 					</view>
 				</view>
 				<view v-if="!isLogin" class="no-login" @tap="toLogin">立即登录</view>
+				<!-- 退出入口(2026-09-04 v2.1.7):置顶显眼,退出后直接跳登录页可重扫 -->
+				<view v-if="isLogin" style="position: absolute; right: 30rpx; top: 20rpx; z-index: 30; padding: 10rpx 26rpx; border: 1rpx solid #e5433c; border-radius: 30rpx;" @tap="toLogout">
+					<text style="color: #e5433c; font-size: 26rpx;">退出登录</text>
+				</view>
 				<view class="wallet" v-if="isLogin">
 					<view class="wallet-info">
 						<view class="wallet-all">
@@ -172,13 +176,14 @@ export default {
 				content: '确定退出当前账号？',
 				success: (m) => {
 					if (!m.confirm) return;
+					this.isLogin = false;   // 先切状态(v2.1.7:防后续清理异常中断)
+					this.balance = 0;
 					try { uni.removeStorageSync('wanju_token'); uni.removeStorageSync('wanju_nickName'); uni.removeStorageSync('wanju_avatarUrl'); } catch(e){}
 					// #ifdef APP-PLUS
-					plus.storage.removeItem('unlocked_'); // 不存在也无害
+					try { plus.storage.removeItem('unlocked_'); } catch(e) {}
 					// #endif
-					this.isLogin = false;
-					this.balance = 0;
 					uni.showToast({icon:'none', title:'已退出'});
+					setTimeout(() => { uni.navigateTo({ url: '/pages/login/login' }); }, 600);  // 直接进登录页(含扫码)
 				}
 			});
 		},
