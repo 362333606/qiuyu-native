@@ -244,7 +244,7 @@
 					// uni.removeStorageSync('game_notice1_ok');
 					setTimeout(() => {
 					   uni.switchTab({
-					   	url: '/pages/chat/index'
+					   	url: '/pages/qa/index'
 					   });
 					}, 500);
 				})

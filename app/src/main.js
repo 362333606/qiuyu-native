@@ -100,7 +100,7 @@ Vue.prototype.ajax = function(url, method, data, fun) {
 			uni.hideLoading();
 			if (resp.statusCode == 401) {
 				uni.redirectTo({
-					url: "/pages/login/login.vue"
+					url: "/pages/login/login"
 				})
 			} else if (resp.statusCode == 200 && resp.data.code == 200) {
 				let data = resp.data
@@ -116,9 +116,17 @@ Vue.prototype.ajax = function(url, method, data, fun) {
 					title: resp.data.msg
 				})
 			}
+		},
+		fail: function(err) {
+			// 2026-09-05补: 网络层失败时关掉loading,否则转圈永不消失=观感"锁死"
+			uni.hideLoading();
+			uni.showToast({
+				icon: "none",
+				title: "网络异常,请重试"
+			});
 		}
 	})
-}	
+}
 Date.prototype.format = function(fmt) {
 	var o = {
 		"M+": this.getMonth() + 1, //月份 

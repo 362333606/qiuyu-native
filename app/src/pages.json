@@ -1,11 +1,10 @@
 {
     "pages" : [
 		{
-		    "path" : "pages/qa/index",
+		    "path" : "pages/match/index",
 		    "style" : {
-		        "navigationBarTitleText" : "球域AI",
-		        "navigationBarBackgroundColor" : "#2f7dcb",
-		        "navigationBarTextStyle" : "white"
+		        "navigationBarTitleText" : "球域Ai",
+				"navigationStyle": "custom"
 		    }
 		},
 		{
@@ -22,10 +21,11 @@
 		    }
 		},
 		{
-		    "path" : "pages/match/index",
+		    "path" : "pages/qa/index",
 		    "style" : {
-		        "navigationBarTitleText" : "球域Ai",
-				"navigationStyle": "custom"
+		        "navigationBarTitleText" : "球域AI",
+		        "navigationBarBackgroundColor" : "#2f7dcb",
+		        "navigationBarTextStyle" : "white"
 		    }
 		},
 		{
