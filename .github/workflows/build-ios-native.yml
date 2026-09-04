@@ -204,7 +204,7 @@ jobs:
           </document>
           LSXML
           cp "$APP_ROOT/LaunchScreen.storyboard" "$APP_ROOT/Base.lproj/LaunchScreen.storyboard"
-          plutil -lint "$APP_ROOT/LaunchScreen.storyboard"
+          xmllint --noout "$APP_ROOT/LaunchScreen.storyboard" && echo "storyboard XML合法"  # plutil只验plist,storyboard根元素是document,用xmllint验XML
 
       # ── 4. 签名材料 ──
       - name: Import certificate & profile
