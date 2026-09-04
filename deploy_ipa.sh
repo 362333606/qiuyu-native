@@ -1,8 +1,9 @@
 #!/bin/bash
 # 球域AI原生APP ipa部署链路: GitHub artifact → 118拉包 → 本机中转 → 119替换+版本号 → 三重验证
-# 用法: bash deploy_ipa.sh <run_id>   (run_id=成功的build-ios-native run号)
+# 用法: bash deploy_ipa.sh <run_id> [版本号]   (run_id=成功的build-ios-native run号; 版本默认2.1.0)
 set -e
-RUN_ID=${1:?用法: bash deploy_ipa.sh <run_id>}
+RUN_ID=${1:?用法: bash deploy_ipa.sh <run_id> [版本号]}
+VER=${2:-2.1.0}
 # GH令牌不进repo(20260904:准备转公开仓库免费构建,明文token已清,改读repo外本机文件)
 GH_TOKEN_FILE="/home/ubuntu/.cc-connect/employees/meimei/workspace/球域AIAPP/证书/gh_token.txt"
 GH_TOKEN=$(cat "$GH_TOKEN_FILE" | tr -d '[:space:]')
@@ -31,26 +32,28 @@ echo "════ [3/5] 本机中转ipa ════"
 sshpass -p 'zxc986111.' scp -o StrictHostKeyChecking=no ubuntu@118.24.135.162:/tmp/qiuyu-ipa/*.ipa /tmp/qiuyu-native.ipa
 ls -la /tmp/qiuyu-native.ipa
 
-echo "════ [4/5] 119部署: 备份旧包→替换→版本号2.1.0 ════"
+echo "════ [4/5] 119部署: 备份旧包→替换→版本号$VER ════"
 sshpass -p 'zxc986111.' ssh -o StrictHostKeyChecking=no ubuntu@119.29.4.24 '
 mkdir -p /home/ubuntu/ipa-backup
 cp /var/www/qiuyu-app/QiuYuAI.ipa /home/ubuntu/ipa-backup/QiuYuAI-v1shell-$(date +%m%d%H%M).ipa 2>/dev/null || echo "(无旧包)"
 cp /var/www/qiuyu-app/manifest.plist /home/ubuntu/ipa-backup/manifest-$(date +%m%d%H%M).plist
 '
 sshpass -p 'zxc986111.' scp -o StrictHostKeyChecking=no /tmp/qiuyu-native.ipa ubuntu@119.29.4.24:/tmp/QiuYuAI-new.ipa
-sshpass -p 'zxc986111.' ssh -o StrictHostKeyChecking=no ubuntu@119.29.4.24 '
+sshpass -p 'zxc986111.' ssh -o StrictHostKeyChecking=no ubuntu@119.29.4.24 "
 sudo cp /tmp/QiuYuAI-new.ipa /var/www/qiuyu-app/QiuYuAI.ipa
-# 版本号写manifest bundle-version(正则只匹配bundle-version后的值,不误伤其他string;旧sed写死1.0.2→2.0.0已失配)
-sudo python3 -c "
+# 版本号写manifest bundle-version(正则只匹配bundle-version后的值,不误伤其他string)
+sudo python3 -c \"
 import re
 p='/var/www/qiuyu-app/manifest.plist'
 c=open(p).read()
-c=re.sub(r'(<key>bundle-version</key>\s*<string>)[^<]+(</string>)', r'\g<1>2.1.0\g<2>', c)
+c=re.sub(r'(<key>bundle-version</key>\s*<string>)[^<]+(</string>)', r'\g<1>$VER\g<2>', c)
 open(p,'w').write(c)
-print('bundle-version -> 2.1.0')
-"
+print('bundle-version -> $VER')
+\"
+# install.html静态页版本文字同步(留bak)
+sudo sed -i.bak-deploy-$(date +%m%d%H%M) 's/v2\.1\.[0-9][0-9]*/v$VER/g' /var/www/qiuyu-app/install.html && echo 'install.html版本文字已同步'
 ls -la /var/www/qiuyu-app/
-'
+"
 
 echo "════ [5/5] 三重验证 ════"
 echo "--- 验1: install入口302 ---"
