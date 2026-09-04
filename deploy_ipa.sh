@@ -3,8 +3,10 @@
 # 用法: bash deploy_ipa.sh <run_id>   (run_id=成功的build-ios-native run号)
 set -e
 RUN_ID=${1:?用法: bash deploy_ipa.sh <run_id>}
-GH_TOKEN=$(echo "Z2hwX2xXSkpwY0VKeU4xQW94cm9HdnlkUUY4cVJ1MHoyy" | base64 -d 2>/dev/null || true)
-GH_TOKEN=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
+# GH令牌不进repo(20260904:准备转公开仓库免费构建,明文token已清,改读repo外本机文件)
+GH_TOKEN_FILE="/home/ubuntu/.cc-connect/employees/meimei/workspace/球域AIAPP/证书/gh_token.txt"
+GH_TOKEN=$(cat "$GH_TOKEN_FILE" | tr -d '[:space:]')
+[ -n "$GH_TOKEN" ] || { echo "FATAL: 缺令牌文件 $GH_TOKEN_FILE"; exit 1; }
 R=362333606/qiuyu-native
 TS=$(date +%H%M%S)
 
