@@ -1,6 +1,14 @@
 {
     "pages" : [
 		{
+		    "path" : "pages/qa/index",
+		    "style" : {
+		        "navigationBarTitleText" : "球域AI",
+		        "navigationBarBackgroundColor" : "#2f7dcb",
+		        "navigationBarTextStyle" : "white"
+		    }
+		},
+		{
 		    "path" : "pages/chat/index",
 		    "style" : {
 		        "navigationBarTitleText" : "球域Ai",
@@ -257,7 +265,7 @@
             },
             {
                 "text" : "球域AI",
-                "pagePath" : "pages/chat/index",
+                "pagePath" : "pages/qa/index",
                 "iconPath" : "static/bar/ai.png",
                 "selectedIconPath" : "static/bar/ai-active.png"
             },
