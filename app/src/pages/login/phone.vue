@@ -53,7 +53,12 @@
 						title: "绑定手机号成功"
 					});
 					setTimeout(() => {
+					  // #ifdef H5
 					  window.location.href = "/#/pages/chat/index";
+					  // #endif
+					  // #ifdef APP-PLUS
+					  uni.switchTab({url: "/pages/qa/index"});
+					  // #endif
 					}, 500);
 				});
 		    }
