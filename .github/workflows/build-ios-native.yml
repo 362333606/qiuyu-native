@@ -2,6 +2,8 @@ name: iOS Native Build (uni-app离线打包)
 
 on:
   workflow_dispatch:
+  push:
+    branches: [main]
 
 env:
   APPID: ${{ secrets.DCLOUD_APPID }}
@@ -253,3 +255,16 @@ jobs:
           name: qiuyu-native-ipa-${{ github.run_number }}
           path: ${{ runner.temp }}/ipa/*.ipa
           retention-days: 30
+
+      # 公开Release资产免认证直下(20260904)——GH令牌已被公开仓库安全扫描自动revoke,
+      # artifact API需认证拉不了,改发Release;119直接curl下载部署,全程不再依赖PAT
+      - name: Publish release (ipa免认证直下)
+        if: success()
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          TAG="v2.1.0-r${{ github.run_number }}"
+          gh release create "$TAG" "$RUNNER_TEMP/ipa/"*.ipa \
+            -R "$GITHUB_REPOSITORY" --title "QiuYuAI $TAG" --latest \
+            --notes "v2.1.0 张总实测6问题修复版:install流程/官方logo/名称球域AI/编译器对齐SDK5.25/问答tab白屏/状态栏适配" || echo 'release创建失败不阻塞artifact'
+          gh release view "$TAG" -R "$GITHUB_REPOSITORY" --json assets --jq '.assets[].browser_download_url' || true
