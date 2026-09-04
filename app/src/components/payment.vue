@@ -89,7 +89,12 @@
 			},
 			mounted: function () {
 				if (this.payType == 0 || this.payType == 1) {
+					// #ifdef APP-PLUS
+					this.payWay = 4; // 2026-09-05 v2.1.8:APP端微信支付项隐藏(iswx=false),默认支付宝,防隐形payWay=2进JSAPI死路
+					// #endif
+					// #ifndef APP-PLUS
 					this.payWay = 2;
+					// #endif
 				} else {
 					this.getBalance();
 				}
@@ -101,12 +106,17 @@
 			},
 			methods: {
 				isWeiXinLogin() {
+					// #ifdef H5
 				    var ua = window.navigator.userAgent.toLowerCase();
 				    if (ua.match(/MicroMessenger/i) == 'micromessenger') {
 				        return true; // 微信中打开
 				    } else {
 				        return false; // 普通浏览器中打开
 				    }
+					// #endif
+					// #ifndef H5
+					return false; // 2026-09-05 v2.1.8:APP逻辑层无window(第5颗地雷,挂载即炸),APP恒为非微信环境
+					// #endif
 				},
 				changePayType(type) {
 					console.info(type)
@@ -161,7 +171,13 @@
 								});
 							} else {
 								// 非微信环境，直接跳转支付
+								// #ifdef H5
 								window.location.href = res.msg;
+								// #endif
+								// #ifdef APP-PLUS
+								// 2026-09-05 v2.1.8:APP逻辑层无window.location,收银台在APP内置webview页打开
+								uni.navigateTo({ url: '/pages/web/pay?u=' + encodeURIComponent(res.msg) });
+								// #endif
 							}
 						} else {
 							_this.funcwechatReday(res.data);

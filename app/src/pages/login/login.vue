@@ -155,7 +155,12 @@
 					success: (res) => {
 						uni.hideLoading();
 						const d = res.data || {};
-						if (d.code !== 200) return uni.showToast({ icon: 'none', title: '二维码获取失败:' + (d.msg || '') });
+						if (d.code !== 200) {
+							const m = String(d.msg || '');
+							// 2026-09-05 v2.1.8:服务端已中文化,此处兜底防微信英文原文透传给用户
+							const bad = m.indexOf('errcode') > -1 || m.indexOf('Error') > -1;
+							return uni.showToast({ icon: 'none', title: bad ? '二维码获取失败，请稍后重试' : '二维码获取失败:' + m });
+						}
 						this.wxScene = d.scene; this.wxQrUrl = d.qrcodeUrl;
 						this.showWxQr = true; this.wxWaiting = true;
 						this.wxTimer = setInterval(() => this.pollWx(), 2000);

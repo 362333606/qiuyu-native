@@ -9,6 +9,12 @@
 		    }
 		},
 		{
+		    "path" : "pages/web/pay",
+		    "style" : {
+		        "navigationBarTitleText" : "收银台"
+		    }
+		},
+		{
 		    "path" : "pages/chat/index",
 		    "style" : {
 		        "navigationBarTitleText" : "球域Ai",
