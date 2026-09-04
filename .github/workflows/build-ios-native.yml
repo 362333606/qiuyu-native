@@ -75,7 +75,7 @@ jobs:
           <?xml version="1.0" encoding="utf-8"?>
           <HBuilder debug="false" version="5.25.2026082902">
             <apps>
-              <app appid="$APPID" appver="2.1.4" appkey="$APPKEY"/>
+              <app appid="$APPID" appver="2.1.5" appkey="$APPKEY"/>
             </apps>
           </HBuilder>
           XML
@@ -265,7 +265,7 @@ jobs:
             -destination 'generic/platform=iOS' \
             -archivePath "$RUNNER_TEMP/QiuYuAI.xcarchive" \
             CURRENT_PROJECT_VERSION="$BUILD_NUMBER" \
-            MARKETING_VERSION=2.1.4 \
+            MARKETING_VERSION=2.1.5 \
             CODE_SIGN_STYLE=Manual \
             PROVISIONING_PROFILE="$PROFILE_UUID" \
             PROVISIONING_PROFILE_SPECIFIER="$PROFILE_UUID" \

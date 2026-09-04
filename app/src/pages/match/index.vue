@@ -402,9 +402,12 @@
 			},
 			// 可选：自动滚动到最右边（确保最新日期默认可见）
 			scrollToRight() {
+			  // #ifdef H5
 			  const scrollContainer = document.querySelector('.date-scroll-container');
-			  // 滚动到容器最右侧（scrollLeft = 最大滚动距离）
 			  scrollContainer.scrollLeft = scrollContainer.scrollWidth;
+			  // #endif
+			  // APP端修复(2026-09-04 v2.1.5):document在APP逻辑层不存在,原版在此抛错中断后续getList→
+			  // 进赛事页默认"今天"永远0场、手动选日期才有数据(张总三端实测反馈);APP端无DOM无需滚动
 			},
 			cateSelect(i){
 				this.cateIndex = i;
