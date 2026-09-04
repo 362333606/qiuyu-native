@@ -1,5 +1,6 @@
 <template>
 	<view class="page">
+		<view class="qiuyu-statusbar"></view>
 		<uni-notice-bar v-if="noticeDetail" show-icon scrollable color="#77858e" background-color="white" style="margin-bottom: 0px;"
 			:text="noticeDetail" />
 			

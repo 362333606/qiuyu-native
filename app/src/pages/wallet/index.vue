@@ -1,5 +1,6 @@
 <template>
     <view class="partner-container">
+		<view class="qiuyu-statusbar"></view>
 		<!-- 自定义导航栏 -->
 		<view class="gc-head">
 			<view class="gc-head-title" @click="toDownload">

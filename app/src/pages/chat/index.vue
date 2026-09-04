@@ -1,5 +1,6 @@
 <template>
 	<view class="goods-container ">
+		<view class="qiuyu-statusbar"></view>
 		<!-- 自定义导航栏 -->
 		<view class="gc-head">
 			<view class="gc-head-title"  @click="showDrawer()">
@@ -194,7 +195,8 @@ import payment from '@/components/payment';
 import { TUILogin } from '@tencentcloud/tui-core';
 // #ifdef APP-PLUS || H5
 import { TUIChatKit } from '@/TUIKit/index';
-TUIChatKit.init();
+// 防御(20260904):TUIKit在app-plus环境init异常会中断页面模块加载→整页白屏卡死,失败仅告警不阻断;H5行为不变
+try { TUIChatKit.init(); } catch (e) { console.warn('[TUIKit] init skipped:', e && e.message); }
 // #endif
 	export default {
 		components: {

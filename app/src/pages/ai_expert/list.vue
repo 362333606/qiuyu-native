@@ -1,6 +1,7 @@
 <template>
     <view class="page">
-		
+		<view class="qiuyu-statusbar"></view>
+
 		<view style="text-align: center;margin: 40rpx;">
 			<view>
 				<text class="question-bottom-top"><image src="/static/icon/ai.png" style="width: 18px;height: 18px;vertical-align: text-bottom;margin-right: 10rpx;"></image>智能预测模型</text>

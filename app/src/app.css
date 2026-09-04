@@ -48,3 +48,8 @@
 .mount-family {
 	font-family: Avenir-Heavy,PingFang SC,Helvetica Neue,Arial,sans-serif;
 }
+/* iOS状态栏占位(20260904 v2.1.0)——APP端沉浸式渲染内容从屏幕顶开始,占位下移避开状态栏电量格;H5端--status-bar-height=0自动无效 */
+.qiuyu-statusbar {
+	height: var(--status-bar-height);
+	width: 100%;
+}
