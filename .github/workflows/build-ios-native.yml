@@ -15,7 +15,8 @@ env:
 jobs:
   build:
     name: 离线打包 AdHoc
-    runs-on: macos-15
+    # 20260905:macos-15(Xcode16.4/iOS18.5 SDK)已被苹果拒收——4月起强制Xcode26+/iOS26 SDK才能传ASC
+    runs-on: macos-26
     timeout-minutes: 150
     steps:
       - name: Checkout
