@@ -357,6 +357,7 @@ jobs:
               <key>cn.qyai001.qiuyu</key><string>${{ env.PROFILE_UUID_AS }}</string>
             </dict>
           </dict>
+          </plist>
           PLIST
           xcodebuild -exportArchive \
             -archivePath "$RUNNER_TEMP/QiuYuAI.xcarchive" \
