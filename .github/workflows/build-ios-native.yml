@@ -75,7 +75,7 @@ jobs:
           <?xml version="1.0" encoding="utf-8"?>
           <HBuilder debug="false" version="5.25.2026082902">
             <apps>
-              <app appid="$APPID" appver="2.1.7" appkey="$APPKEY"/>
+              <app appid="$APPID" appver="2.1.11" appkey="$APPKEY"/>
             </apps>
           </HBuilder>
           XML

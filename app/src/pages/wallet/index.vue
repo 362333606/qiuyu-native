@@ -22,10 +22,6 @@
 					</view>
 				</view>
 				<view v-if="!isLogin" class="no-login" @tap="toLogin">立即登录</view>
-				<!-- 退出入口(2026-09-04 v2.1.7):置顶显眼,退出后直接跳登录页可重扫 -->
-				<view v-if="isLogin" style="position: absolute; right: 30rpx; top: calc(var(--status-bar-height) + 120rpx); z-index: 30; padding: 10rpx 26rpx; border: 1rpx solid #e5433c; border-radius: 30rpx;" @tap="toLogout">
-					<text style="color: #e5433c; font-size: 26rpx;">退出登录</text>
-				</view>
 				<view class="wallet" v-if="isLogin">
 					<view class="wallet-info">
 						<view class="wallet-all">
@@ -40,6 +36,10 @@
 				<view style="color: white;border-bottom: 1px solid #dfebef;padding: 10px;margin: 10px 15px;" @click="toInvite()">
 					<text>邀请返佣</text>
 					<text style="float: right;"><text style="font-size: 24rpx;margin-right: 5px;">邀请好友解锁成功，获得奖励</text>></text>
+				</view>
+				<!-- 退出登录(2026-09-05 v2.1.11张总令:撤悬浮红钮,改列表行与邀请返佣同款,不再突兀) -->
+				<view v-if="isLogin" style="color: #e5433c;padding: 10px;margin: 0 15px 10px;" @tap="toLogout">
+					<text>退出登录</text>
 				</view>
 				<swiper class="swiper" circular :current="current" :indicator-dots="indicatorDots" :autoplay="autoplay" :interval="interval"
 								:duration="duration">
@@ -85,11 +85,6 @@
 		</view>
 
 	<view class="show-popup" v-if="isPay">
-		<!-- 退出登录(2026-09-04 v2.1.6):APP需要可退出换号;公众号时代无此设计 -->
-		<view v-if="isLogin" style="margin: 40rpx 5%; padding: 26rpx 0; text-align: center; background: #fff; border-radius: 20rpx;" @tap="toLogout">
-			<text style="color: #e5433c; font-size: 30rpx;">退出登录</text>
-		</view>
-
 		<view class="popup-mask" @click="closePay"></view>
 		<view class="popup-contents">
 			<payment @toCancel="closePay" @okPay="okPay" :payTypeId="2" :payOrderId="payOrderId" :payAmount="payAmount"></payment>
