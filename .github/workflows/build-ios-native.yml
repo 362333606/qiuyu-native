@@ -149,6 +149,8 @@ jobs:
           # 显示名（demo的plist名是HBuilder-Hello-Info.plist）
           plutil -replace CFBundleDisplayName -string "球域AI" "$APP_ROOT/HBuilder-Hello-Info.plist"
           plutil -replace CFBundleName -string "球域AI" "$APP_ROOT/HBuilder-Hello-Info.plist"
+          # 出口合规(TestFlight分发前置20260905):声明只用系统HTTPS不含自研加密,防合规问询卡审
+          plutil -replace ITSAppUsesNonExemptEncryption -bool false "$APP_ROOT/HBuilder-Hello-Info.plist"
           # 本地化显示名——zh-Hans.lproj/InfoPlist.strings里demo默认"HBuilder 你好"会覆盖Info.plist(张总手机中文系统实测显示hbuilder你好),必须一并改写
           printf '/* Localized versions of Info.plist keys */\nCFBundleDisplayName="球域AI";\n' > "$APP_ROOT/zh-Hans.lproj/InfoPlist.strings"
           printf '/* Localized versions of Info.plist keys */\nCFBundleDisplayName="球域AI";\n' > "$APP_ROOT/en.lproj/InfoPlist.strings"
@@ -265,7 +267,7 @@ jobs:
             -destination 'generic/platform=iOS' \
             -archivePath "$RUNNER_TEMP/QiuYuAI.xcarchive" \
             CURRENT_PROJECT_VERSION="$BUILD_NUMBER" \
-            MARKETING_VERSION=2.1.7 \
+            MARKETING_VERSION=2.1.11 \
             CODE_SIGN_STYLE=Manual \
             PROVISIONING_PROFILE="$PROFILE_UUID" \
             PROVISIONING_PROFILE_SPECIFIER="$PROFILE_UUID" \
@@ -320,3 +322,61 @@ jobs:
             -R "$GITHUB_REPOSITORY" --title "QiuYuAI $TAG" --latest \
             --notes "v2.1.0 张总实测6问题修复版:install流程/官方logo/名称球域AI/编译器对齐SDK5.25/问答tab白屏/状态栏适配" || echo 'release创建失败不阻塞artifact'
           gh release view "$TAG" -R "$GITHUB_REPOSITORY" --json assets --jq '.assets[].browser_download_url' || true
+
+      # ── 7. TestFlight双发(20260905张总令:TestFlight修复)──
+      # 超级签ipa已发布上方;此处再导出App Store签名版传TestFlight。
+      # 内测组hasAccessToAllBuilds=True,新构建处理完自动对测试员可见。
+      - name: Import App Store profile
+        env:
+          PROFILE_APPSTORE_B64: ${{ secrets.APPLE_PROFILE_APPSTORE_B64 }}
+        run: |
+          echo "$PROFILE_APPSTORE_B64" | base64 --decode > "$RUNNER_TEMP/profile_appstore.mobileprovision"
+          UUID_AS=$(security cms -D -i "$RUNNER_TEMP/profile_appstore.mobileprovision" | plutil -extract UUID raw -o - -)
+          PP_OLD="$HOME/Library/MobileDevice/Provisioning Profiles"
+          PP_NEW="$HOME/Library/Developer/Xcode/UserData/Provisioning Profiles"
+          mkdir -p "$PP_OLD" "$PP_NEW"
+          cp "$RUNNER_TEMP/profile_appstore.mobileprovision" "$PP_OLD/$UUID_AS.mobileprovision"
+          cp "$RUNNER_TEMP/profile_appstore.mobileprovision" "$PP_NEW/$UUID_AS.mobileprovision"
+          echo "PROFILE_UUID_AS=$UUID_AS" >> "$GITHUB_ENV"
+          echo "App Store profile UUID=$UUID_AS 已装双路径"
+
+      # 用同一xcarchive重导app-store签名版(manual签名,exportArchive按ExportOptions重签)
+      - name: Export IPA (app-store)
+        run: |
+          cat > "$RUNNER_TEMP/ExportOptions-AppStore.plist" <<PLIST
+          <?xml version="1.0" encoding="UTF-8"?>
+          <!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+          <plist version="1.0">
+          <dict>
+            <key>method</key><string>app-store</string>
+            <key>signingCertificate</key><string>Apple Distribution</string>
+            <key>signingStyle</key><string>manual</string>
+            <key>teamID</key><string>${{ env.TEAM_ID }}</string>
+            <key>provisioningProfiles</key>
+            <dict>
+              <key>cn.qyai001.qiuyu</key><string>${{ env.PROFILE_UUID_AS }}</string>
+            </dict>
+          </dict>
+          PLIST
+          xcodebuild -exportArchive \
+            -archivePath "$RUNNER_TEMP/QiuYuAI.xcarchive" \
+            -exportPath "$RUNNER_TEMP/ipa-appstore" \
+            -exportOptionsPlist "$RUNNER_TEMP/ExportOptions-AppStore.plist" \
+            > /tmp/export-as.log 2>&1 || { echo '=== app-store export失败,最后60行 ==='; tail -60 /tmp/export-as.log; exit 1; }
+          ls -la "$RUNNER_TEMP/ipa-appstore"
+
+      - name: Upload to TestFlight
+        env:
+          ASC_API_KEY: ${{ secrets.ASC_API_KEY_P8 }}
+          ASC_KEY_ID: ${{ secrets.ASC_KEY_ID }}
+          ASC_ISSUER: ${{ secrets.ASC_ISSUER_ID }}
+        run: |
+          mkdir -p "$HOME/.appstoreconnect/private_keys"
+          printf '%s' "$ASC_API_KEY" > "$HOME/.appstoreconnect/private_keys/AuthKey_${ASC_KEY_ID}.p8"
+          IPA=$(ls "$RUNNER_TEMP/ipa-appstore/"*.ipa | head -1)
+          echo "Uploading $IPA to TestFlight ..."
+          xcrun altool --upload-app \
+            -f "$IPA" \
+            --apiKey "$ASC_KEY_ID" \
+            --apiIssuer "$ASC_ISSUER" \
+            --type ios
