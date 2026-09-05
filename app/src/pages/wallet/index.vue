@@ -23,7 +23,7 @@
 				</view>
 				<view v-if="!isLogin" class="no-login" @tap="toLogin">立即登录</view>
 				<!-- 退出入口(2026-09-04 v2.1.7):置顶显眼,退出后直接跳登录页可重扫 -->
-				<view v-if="isLogin" style="position: absolute; right: 30rpx; top: 20rpx; z-index: 30; padding: 10rpx 26rpx; border: 1rpx solid #e5433c; border-radius: 30rpx;" @tap="toLogout">
+				<view v-if="isLogin" style="position: absolute; right: 30rpx; top: calc(var(--status-bar-height) + 120rpx); z-index: 30; padding: 10rpx 26rpx; border: 1rpx solid #e5433c; border-radius: 30rpx;" @tap="toLogout">
 					<text style="color: #e5433c; font-size: 26rpx;">退出登录</text>
 				</view>
 				<view class="wallet" v-if="isLogin">

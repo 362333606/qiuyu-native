@@ -11,7 +11,7 @@
 export default {
 	data() {
 		return {
-			qaUrl: 'https://qyai001.cn/qa/',
+			qaUrl: 'https://qyai001.cn/qa/?from=app', // from=app:H5侧据此隐藏网页版专用的"退出登录"(APP退出统一走我的页,20260905张总令)
 			// 20260904 v2.1.2 张总嫌顶部网页进度条存在感太强→去掉(加载期由原生导航栏顶着)
 			wvStyles: {}
 		}
