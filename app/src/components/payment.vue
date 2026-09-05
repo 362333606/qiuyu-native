@@ -17,7 +17,7 @@
 					<image class="icon-image" :src="payWay == 1 ? selected : selectedNo"></image>
 				</template>
 			</uni-list-item>
-			<uni-list-item title="微信支付" note="微信安全支付" v-if="iswx"
+			<uni-list-item title="微信扫码支付" note="截图后微信扫一扫付款" v-if="iswx || isApp"
 				thumb="/static/wechat_pay.png"
 				thumb-size="lg" clickable @click="changePayType(2)">
 				<template v-slot:footer>
@@ -41,6 +41,22 @@
 		</uni-list>
 		<view class="submit-pay" @tap="confirmPay">
 			<text>确认支付</text>
+		</view>
+		<!-- 2026-09-05 v2.1.12: 微信扫码支付弹层(截图→微信扫一扫→相册识别,同机可付) -->
+		<view class="qr-mask" v-if="qrShow" @tap="closeQr">
+			<view class="qr-card" @tap.stop>
+				<text class="qr-title">微信扫码支付</text>
+				<text class="qr-amount">¥{{payAmount.toFixed(2)}}</text>
+				<image class="qr-img" :src="qrUrl" mode="aspectFit"></image>
+				<view class="qr-steps">
+					<text>① 截图保存这张二维码</text>
+					<text>② 打开微信「扫一扫」</text>
+					<text>③ 点右下角「相册」选截图</text>
+					<text>④ 付款后本页自动到账</text>
+				</view>
+				<view class="qr-done-btn" @tap="checkQrNow">我已完成支付</view>
+				<text class="qr-cancel" @tap="closeQr">取消</text>
+			</view>
 		</view>
 	</view>
 </template>
@@ -72,6 +88,11 @@
 	    data() {
 	        return {
 				iswx: false,
+				isApp: false, // 2026-09-05 v2.1.12:APP端微信=扫码支付,恢复可见
+				qrShow: false,
+				qrUrl: '',
+				qrOrderNo: '',
+				qrTimer: null,
 				gratuityArray: [],
 				chooseIndex:'',
 				payWay:0,
@@ -88,9 +109,12 @@
 				}
 			},
 			mounted: function () {
+				// #ifdef APP-PLUS
+				this.isApp = true;
+				// #endif
 				if (this.payType == 0 || this.payType == 1) {
 					// #ifdef APP-PLUS
-					this.payWay = 4; // 2026-09-05 v2.1.8:APP端微信支付项隐藏(iswx=false),默认支付宝,防隐形payWay=2进JSAPI死路
+					this.payWay = 2; // 2026-09-05 v2.1.12:APP端默认微信扫码支付(弹二维码,不走JSAPI死路)
 					// #endif
 					// #ifndef APP-PLUS
 					this.payWay = 2;
@@ -104,7 +128,66 @@
 					this.payWay = 4;
 				}
 			},
+			beforeDestroy() { this.stopQrPoll(); },
 			methods: {
+				// ===== 2026-09-05 v2.1.12: APP端微信扫码支付 =====
+				wxQrPay() {
+					let _this = this;
+					let params = {};
+					params.payOrderId = this.payOrderId;
+					params.payType = this.payType;
+					params.body = this.payTitle[this.payType];
+					if (uni.getStorageSync('wanju_token')) {
+						params.token = uni.getStorageSync('wanju_token')
+					}
+					_this.ajax(_this.url.qrCreate, "POST", params, function(res) {
+						if (res && res.data && res.data.qr_url) {
+							_this.qrUrl = 'https://api.qrserver.com/v1/create-qr-code/?data=' + encodeURIComponent(res.data.qr_url) + '&size=220x220';
+							_this.qrOrderNo = res.data.order_no || '';
+							_this.qrShow = true;
+							_this.startQrPoll();
+						} else {
+							uni.showToast({icon: 'none', title: (res && res.msg) || '二维码生成失败'});
+						}
+					});
+				},
+				startQrPoll() {
+					this.stopQrPoll();
+					let n = 0;
+					let _this = this;
+					this.qrTimer = setInterval(function() {
+						n++;
+						if (n > 100 || !_this.qrShow) { _this.stopQrPoll(); return; } // H5同款:上限100次(约5分钟)
+						_this.checkQr(false);
+					}, 3000);
+				},
+				checkQr(manual) {
+					let _this = this;
+					if (!_this.qrOrderNo) return;
+					uni.request({
+						url: 'https://qyai001.cn/api/pay/qr-status?order_no=' + encodeURIComponent(_this.qrOrderNo),
+						method: 'GET',
+						success: function(resp) {
+							let d = resp && resp.data;
+							if (d && d.code == 200 && d.data && d.data.status === 'paid') {
+								_this.stopQrPoll();
+								_this.qrShow = false;
+								uni.showToast({title: '支付成功'});
+								setTimeout(() => { _this.$emit("okPay"); }, 1200);
+							} else if (manual) {
+								uni.showToast({icon: 'none', title: '还没查到付款,过几秒再点'});
+							}
+						}
+					});
+				},
+				checkQrNow() { this.checkQr(true); },
+				stopQrPoll() {
+					if (this.qrTimer) { clearInterval(this.qrTimer); this.qrTimer = null; }
+				},
+				closeQr() {
+					this.stopQrPoll();
+					this.qrShow = false;
+				},
 				isWeiXinLogin() {
 					// #ifdef H5
 				    var ua = window.navigator.userAgent.toLowerCase();
@@ -123,6 +206,9 @@
 					this.payWay = type;
 				},
 				confirmPay(){
+					// #ifdef APP-PLUS
+					if (this.payWay == 2) { this.wxQrPay(); return; } // 2026-09-05 v2.1.12:APP微信=扫码,走qr-create(复用H5外部浏览器同款线上链路,后端零改)
+					// #endif
 					if (this.payWay == 0) {
 						uni.showToast({icon: 'none',title: '请选择支付方式'}); 
 						return;
@@ -321,4 +407,25 @@
 		text-align: center;
 	}
 	
+	/* 2026-09-05 v2.1.12: 微信扫码支付弹层 */
+	.qr-mask{
+		position: fixed; left: 0; top: 0; right: 0; bottom: 0;
+		background: rgba(0,0,0,0.55); z-index: 9999;
+		display: flex; align-items: center; justify-content: center;
+	}
+	.qr-card{
+		width: 580rpx; background: #ffffff; border-radius: 24rpx;
+		padding: 40rpx 36rpx 30rpx; display: flex; flex-direction: column; align-items: center;
+	}
+	.qr-title{ font-size: 34rpx; font-weight: bolder; color: #222; }
+	.qr-amount{ font-size: 44rpx; font-weight: bolder; color: #fd2e54; margin: 14rpx 0 20rpx; }
+	.qr-img{ width: 400rpx; height: 400rpx; }
+	.qr-steps{ display: flex; flex-direction: column; gap: 8rpx; margin: 22rpx 0 6rpx; }
+	.qr-steps text{ font-size: 26rpx; color: #555; }
+	.qr-done-btn{
+		width: 100%; margin-top: 26rpx; background: #09bb07; color: #fff;
+		font-size: 30rpx; font-weight: bolder; text-align: center;
+		padding: 20rpx 0; border-radius: 14rpx;
+	}
+	.qr-cancel{ margin-top: 18rpx; font-size: 27rpx; color: #999; padding: 8rpx 30rpx; }
 </style>

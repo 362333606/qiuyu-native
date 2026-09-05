@@ -33,6 +33,8 @@ Vue.prototype.url={
 	rechargePackage: "/balance/recharge_Package",
 	balanceDeposit: "/balance/deposit",
 	payOrder: "/pay/order",
+	qrCreate: "/pay/qr-create", // 2026-09-05 v2.1.12:微信扫码支付(线上ApiQrPayController,与H5外部浏览器同款)
+	qrStatus: "/pay/qr-status",
 	balance: "/balance",
 	models: "/models",
 	orderCreate: "/order/create",

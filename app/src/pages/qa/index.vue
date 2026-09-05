@@ -11,9 +11,20 @@
 export default {
 	data() {
 		return {
-			qaUrl: 'https://qyai001.cn/qa/?from=app', // from=app:H5侧据此隐藏网页版专用的"退出登录"(APP退出统一走我的页,20260905张总令)
+			qaUrl: this.qaBuildUrl(), // 20260905张总批:URL令牌注入——原生storage与webview localStorage不通,带token让H5侧resolveUid换q号,积分跟登录账号走
 			// 20260904 v2.1.2 张总嫌顶部网页进度条存在感太强→去掉(加载期由原生导航栏顶着)
 			wvStyles: {}
+		}
+	},
+	onShow() { // 登录/换号后令牌变化时刷新webview(仅token变化才重设src)
+		const u = this.qaBuildUrl();
+		if (u !== this.qaUrl) this.qaUrl = u;
+	},
+	methods: {
+		qaBuildUrl() { // from=app:H5侧据此隐藏网页版"退出登录"(20260905张总令)+注入登录令牌
+			let tk = '';
+			try { tk = uni.getStorageSync('wanju_token') || ''; } catch (e) {}
+			return 'https://qyai001.cn/qa/?from=app' + (tk ? '&token=' + encodeURIComponent(tk) : '');
 		}
 	}
 }
