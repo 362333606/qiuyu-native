@@ -16,8 +16,10 @@
             "autoclose" : true,
             "delay" : 0
         },
-        /* 模块配置 */
-        "modules" : {},
+        /* 模块配置 — 2026-09-06 v2.1.13: 开Push模块(uniPush2.0,离线打包原生侧由CI配置capability) */
+        "modules" : {
+            "Push" : {}
+        },
         /* 应用发布信息 */
         "distribute" : {
             /* android打包配置 */
