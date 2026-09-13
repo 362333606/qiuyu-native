@@ -1,146 +1,228 @@
 <template>
-    <view class="partner-container">
+    <view class="qt-page">
 		<view class="qiuyu-statusbar"></view>
-		<!-- 自定义导航栏 -->
-		<view class="gc-head">
-			<view class="gc-head-title" @click="toDownload">
-				APP下载
+		<!-- ===== 头部(2026-09-14 v3生产版:去顶部解锁记录pill与功能列表去重) ===== -->
+		<view class="head">
+			<view class="head-top">
+				<view class="head-pill" @click="toDownload">APP下载</view>
 			</view>
-			<view class="gc-head-img" @click="menuToggle('top')">
-				<text>钱包</text>
-			</view>
-			<view class="gc-post-btn" style="text-align: right" @click="toPaidList()">
-				解锁记录
-			</view>
-		</view>
-		<view style="margin: 40rpx;">
-			<view class="partner-head">
-					<view class="user-head">
-						<view class="user-head-item">
-							<image :src="imagebaseurl + avatarUrl" class="userinfo-avatar" v-if="avatarUrl"></image>
-						</view>
-					</view>
-				</view>
-				<view v-if="!isLogin" class="no-login" @tap="toLogin">立即登录</view>
-				<view class="wallet" v-if="isLogin">
-					<view class="wallet-info">
-						<view class="wallet-all">
-							<text class="wallet-title">钱包余额</text>
-							<view class="wallet-balance mount-family">{{balance.toFixed(2)}}</view>
-						</view>
-						<view class="wallet-level" @tap="toPage('/pages/recharge/index')" v-if="isLogin">
-							<text class="wallet-btn">充值</text>
-						</view>
-					</view>
-				</view>
-				<view style="color: white;border-bottom: 1px solid #dfebef;padding: 10px;margin: 10px 15px;" @click="toInvite()">
-					<text>邀请返佣</text>
-					<text style="float: right;"><text style="font-size: 24rpx;margin-right: 5px;">邀请好友解锁成功，获得奖励</text>></text>
-				</view>
-				<!-- 退出登录(2026-09-05 v2.1.11张总令:撤悬浮红钮,改列表行与邀请返佣同款,不再突兀) -->
-				<view v-if="isLogin" style="color: #e5433c;padding: 10px;margin: 0 15px 10px;" @tap="toLogout">
-					<text>退出登录</text>
-				</view>
-				<swiper class="swiper" circular :current="current" :indicator-dots="indicatorDots" :autoplay="autoplay" :interval="interval"
-								:duration="duration">
-				<swiper-item v-for="(item, index) in vipCardList" :key="index">
-					<view class="swiper-item">
-						<view class="wallet-vip" :style="'background: linear-gradient(to right, '+ bgColors[index].bg + ')!important;'">
-							<view class="wallet-info">
-								<view class="" style="width: 70%;">
-									<view class="vip-title">
-										<text style="font-size: 50rpx;flex-grow: 2;">{{item.title}}会员</text>
-										<text style="flex-grow: 2;margin-left: 4rpx;" class="mount-family">{{item.price}}/{{item.days}}天</text>
-									</view>
-									<view class="wallet-desc mount-family ">总计{{item.totalNum}}场解析</view>
-									<view class="wallet-desc mount-family ">赛事解析单日{{item.dayNum}}次 超出{{item.unitPrice}}/场</view>
-								</view>
-								<view class="wallet-level" style="margin-top: -30rpx;">
-										<image :src="imagebaseurl + item.img" class="vip-logo"></image>
-								</view>
-							</view>
-							<view class="wallet-option kaitong-content">
-								<view style="flex-grow: 3" class="mount-family" v-if="vipType == item.type && vipExpireTime">有效期：{{vipExpireTime}}</view>
-								<view style="flex-grow: 3" v-else>开通会员享受权益</view>
-								<view style="flex-grow: 1;font-size: 30rpx;" @click="openVip(item)" class="wallet-btn" v-if="isLogin">
-									<text v-if="vipType == item.type && vipExpireTime">立即续费</text>
-									<text v-else>立即开通</text>
-								</view>
-							</view>
-						</view>
-						<view class="my-icon-menu" v-if="navMenu.length > 0">
-							<view class="vip-pro-title">{{item.title}}会员特权</view>
-							 <view class="my-icon-menu-item" v-for="(menuItem, indexStep) in navMenu">
-								 <view class="my-icon-menu-img">
-									 <image :src="imagebaseurl + menuItem.img" />
-								 </view>
-								 <view style="font-size: 24rpx;">{{menuItem.title}}</view>
-								 <text style="font-size: 20rpx;color: #ccc;">{{item.msg.split(',')[indexStep]}}</text>
-							 </view>
-						</view>
-					</view>
-					
-				</swiper-item>
-			</swiper>
+			<view class="eng-label">QIUYU AI · ACCOUNT</view>
+			<view class="head-name">个人中心</view>
 		</view>
 
-	<view class="show-popup" v-if="isPay">
-		<view class="popup-mask" @click="closePay"></view>
-		<view class="popup-contents">
-			<payment @toCancel="closePay" @okPay="okPay" :payTypeId="2" :payOrderId="payOrderId" :payAmount="payAmount"></payment>
+		<!-- ===== 用户卡片 ===== -->
+		<view class="user-card">
+			<view class="uc-row" @tap="!isLogin && toLogin()">
+				<view class="avatar-ring">
+					<image class="avatar" :src="imagebaseurl + avatarUrl" mode="aspectFill"></image>
+				</view>
+				<view class="uc-info">
+					<view class="uc-name" v-if="isLogin">
+						<text class="uname">{{ nickName || '球域用户' }}</text>
+						<text class="vip-badge" v-if="vipType > 0">{{ vipTypeName }}</text>
+					</view>
+					<view class="uc-name" v-else><text class="uname">立即登录</text></view>
+					<view class="uc-sub" v-if="isLogin && vipType > 0 && vipExpireTime">有效期至 {{ vipExpireTime }}</view>
+					<view class="uc-sub" v-else-if="isLogin">开通会员享受更多权益</view>
+					<view class="uc-sub" v-else>登录后查看会员信息</view>
+				</view>
+			</view>
+			<!-- 微信绑定行:跳手机号绑定页(/user/bindphone) -->
+			<view class="bind-row" v-if="isLogin" @tap="toBindPhone">
+				<view class="wx-ico">
+					<image class="wx-svg" src="/static/wx-white.png" mode="aspectFit"></image>
+				</view>
+				<view class="bind-txt">
+					<view class="bt-main">微信一键登录</view>
+					<view class="bt-sub">绑定手机号后可用手机号登录</view>
+				</view>
+				<view class="bind-btn">去绑定</view>
+			</view>
+			<!-- 余额 -->
+			<view class="wallet-row" v-if="isLogin">
+				<view class="balance">
+					<view class="balance-label">钱包余额 (元)</view>
+					<view class="balance-num">{{ balance.toFixed(2) }}</view>
+				</view>
+				<view class="recharge-btn" @tap="toPage('/pages/recharge/index')">充值</view>
+			</view>
+			<view class="wallet-row" v-else>
+				<view class="balance">
+					<view class="balance-label">钱包余额 (元)</view>
+					<view class="balance-num">0.00</view>
+				</view>
+				<view class="recharge-btn" @tap="toLogin">登录</view>
+			</view>
+		</view>
+
+		<!-- ===== 会员中心(档位选择制) ===== -->
+		<view class="section">
+			<view class="sec-head">
+				<view class="sec-bar"></view>
+				<view class="sec-title">会员中心</view>
+				<view class="sec-eng">MEMBERSHIP</view>
+			</view>
+
+			<view class="tier-tabs" v-if="vipCardList.length > 0">
+				<view class="tt-slider" :class="{ gold: currentCard && currentCard.type == 3 }" :style="'transform:translateX(' + currentTier * 100 + '%)'"></view>
+				<view class="tt" :class="{ on: currentTier == index }" v-for="(item, index) in vipCardList" :key="index" @tap="currentTier = index">
+					{{ item.title }} ¥{{ item.price }}
+				</view>
+			</view>
+
+			<view class="m-card show" v-if="currentCard">
+				<view class="m-top">
+					<view class="ai-chip">
+						<image class="chip-logo" src="/static/qiuyu-logo.png" mode="aspectFit"></image>
+						<text>球域AI</text>
+					</view>
+					<view class="tier-pill" :class="{ gold: currentCard.type == 3 }">{{ tierEng[currentCard.type] || 'VIP' }}</view>
+				</view>
+				<view class="m-eng">QIUYU AI · VIP {{ currentCard.days }} DAYS</view>
+				<view class="m-main">
+					<view class="m-tier" :class="{ 'm-tier-gold': currentCard.type == 3 }">{{ currentCard.title }}会员</view>
+					<view class="m-price">¥{{ currentCard.price }}<text class="m-price-d"> /{{ currentCard.days }}天</text></view>
+				</view>
+				<view class="m-save" v-if="saveAmount > 0">较按月购买 省 ¥{{ saveAmount }}</view>
+				<view class="m-facts">
+					<view class="fact"><view class="fact-b">{{ currentCard.totalNum }}场</view><view class="fact-s">总计解析</view></view>
+					<view class="fact"><view class="fact-b">{{ currentCard.type == 3 ? '无限' : currentCard.dayNum + '次' }}</view><view class="fact-s">单日解析</view></view>
+					<view class="fact"><view class="fact-b">¥{{ currentCard.unitPrice }}</view><view class="fact-s">超出/场</view></view>
+				</view>
+				<view class="m-foot">
+					<view class="m-discount">超出享 {{ tierDiscount[currentCard.type] || '' }} 折</view>
+					<view class="m-expire" v-if="vipType == currentCard.type && vipExpireTime">有效期至 {{ vipExpireTime }}</view>
+					<view class="m-expire" v-else>未开通</view>
+					<view class="m-go" @tap="openVip(currentCard)">{{ vipType == currentCard.type && vipExpireTime ? '立即续费' : '立即开通' }}</view>
+				</view>
+			</view>
+
+			<!-- 会员特权(线上真实菜单 type=6) -->
+			<view class="perk-card" v-if="navMenu.length > 0">
+				<view class="perk" v-for="(menuItem, idx) in navMenu" :key="idx">
+					<view class="perk-ico"><image class="perk-img" :src="imagebaseurl + menuItem.img" mode="aspectFit"></image></view>
+					<view class="perk-t">{{ menuItem.title }}</view>
+				</view>
+			</view>
+		</view>
+
+		<!-- ===== 常用功能(全真实跳转) ===== -->
+		<view class="section">
+			<view class="sec-head">
+				<view class="sec-bar"></view>
+				<view class="sec-title">常用功能</view>
+				<view class="sec-eng">SERVICES</view>
+			</view>
+			<view class="menu-card">
+				<view class="menu-item" @tap="toInvite">
+					<view class="mi-ico"><image class="mi-img" src="/static/icon/menu-invite.png" mode="aspectFit"></image></view>
+					<view class="mi-body">
+						<view class="mi-t">邀请返佣</view>
+						<view class="mi-s">邀请好友解锁成功，获得奖励</view>
+					</view>
+					<view class="mi-tag">有奖励</view>
+					<view class="mi-arrow">›</view>
+				</view>
+				<view class="menu-item" @tap="toPaidList">
+					<view class="mi-ico"><image class="mi-img" src="/static/icon/menu-record.png" mode="aspectFit"></image></view>
+					<view class="mi-body">
+						<view class="mi-t">解锁记录</view>
+						<view class="mi-s">已解锁赛事与判定结果</view>
+					</view>
+					<view class="mi-arrow">›</view>
+				</view>
+				<view class="menu-item" @tap="showService">
+					<view class="mi-ico"><image class="mi-img" src="/static/icon/menu-service.png" mode="aspectFit"></image></view>
+					<view class="mi-body">
+						<view class="mi-t">联系客服</view>
+						<view class="mi-s">问题咨询 · 解锁异常处理</view>
+					</view>
+					<view class="mi-arrow">›</view>
+				</view>
+				<view class="menu-item" @tap="checkUpdate">
+					<view class="mi-ico"><image class="mi-img" src="/static/icon/menu-update.png" mode="aspectFit"></image></view>
+					<view class="mi-body">
+						<view class="mi-t">检查更新</view>
+						<view class="mi-s">当前版本 v{{ appVersion }}</view>
+					</view>
+					<view class="mi-arrow">›</view>
+				</view>
+			</view>
+			<view class="logout-card" v-if="isLogin" @tap="toLogout">退出登录</view>
+		</view>
+
+		<!-- 客服二维码弹窗(与chat页同源 hotWord.customerService) -->
+		<uni-popup ref="servicePopup" background-color="#fff">
+			<view class="service-pop">
+				<view class="service-title">联系客服</view>
+				<image class="service-img" v-if="customerServiceImg" :src="imagebaseurl + customerServiceImg" mode="widthFix"></image>
+				<view class="service-tip">扫码添加客服微信</view>
+			</view>
+		</uni-popup>
+
+		<!-- 支付弹窗 -->
+		<view class="show-popup" v-if="isPay">
+			<view class="popup-mask" @click="closePay"></view>
+			<view class="popup-contents">
+				<payment @toCancel="closePay" @okPay="okPay" :payTypeId="2" :payOrderId="payOrderId" :payAmount="payAmount"></payment>
+			</view>
 		</view>
 	</view>
-		
-		
-    </view>
 </template>
 
 <script>
 const AUTH = require('@/utils/auth');
 import payment from '@/components/payment';
-//index.js
-//获取应用实例
 export default {
 	components: {
 		payment
 	},
     data() {
         return {
-			wxlogin: false,
-			type:0,
 			nickName: uni.getStorageSync('wanju_nickName'),
-			// avatarUrl: uni.getStorageSync('wanju_avatarUrl'),
-			avatarUrl:'comm/images/game_ai_logo.png',
-			num:0,
-			balance:0,
-			dotStyle: 'square-dot',
-			balanceList:[],
+			avatarUrl: 'comm/images/game_ai_logo.png',
+			balance: 0,
 			imagebaseurl: this.ossUrl,
-			vipType:0,
-			vipExpireTime:'',
-			current:0,
-			
-			navMenu:[],
-			indicatorDots: true,
-			autoplay: false,
-			interval: 2000,
-			duration: 500,
-			vipCardList:[],
-			isPay:false,
-			payOrderId:0,
-			payAmount:0,
+			vipType: 0,
+			vipExpireTime: '',
+			currentTier: 0,
+			navMenu: [],
+			vipCardList: [],
+			isPay: false,
+			payOrderId: 0,
+			payAmount: 0,
 			isLogin: false,
-			bgColors: [
-				{bg: "#dfebef, #bccad4"},
-				{bg: "#e9f8f2, #92c9b4"},
-				{bg: "#f8f7d5, #f8d272"}
-			]
+			appVersion: '2.2.0',
+			customerServiceImg: '',
+			// 折扣口径: 2026-09-14 张总定 月9折/季8折/年5折
+			tierDiscount: { 1: '9', 2: '8', 3: '5' },
+			tierEng: { 1: 'MONTHLY', 2: 'QUARTERLY', 3: 'ANNUAL · 尊享' }
         };
     },
-    onLoad: function (options) {
-		if(options.token) {
-		  uni.setStorageSync("wanju_token", options.token);
+	computed: {
+		vipTypeName() {
+			return ({ 1: '月卡会员', 2: '季卡会员', 3: '年卡会员' })[this.vipType] || '';
+		},
+		currentCard() {
+			return this.vipCardList[this.currentTier] || null;
+		},
+		saveAmount() {
+			// 较按月购买: 季=3×月价-季价 年=12×月价-年价
+			if (this.vipCardList.length < 2 || !this.currentCard) return 0;
+			let month = this.vipCardList[0].price;
+			let t = this.currentCard.type;
+			if (t != 2 && t != 3) return 0;
+			let save = (t == 2 ? 3 : 12) * month - this.currentCard.price;
+			return save > 0 ? Math.round(save) : 0;
 		}
+	},
+    onLoad: function (options) {
+		if (options.token) {
+			uni.setStorageSync("wanju_token", options.token);
+		}
+		// #ifdef APP-PLUS
+		try { this.appVersion = plus.runtime.version || this.appVersion; } catch (e) {}
+		// #endif
 		if (!uni.getStorageSync('wanju_token')) {
 			uni.showToast({icon: 'none',title: '请登录后再操作'});
 			return;
@@ -153,9 +235,6 @@ export default {
 		}
 		this.initPage();
 	},
-	onReachBottom: function () {
-		// 滚动刷新
-	},
     methods: {
 		toDownload: function(){
 			// #ifdef H5
@@ -165,37 +244,57 @@ export default {
 			uni.showToast({icon:'none', title:'您已在APP内'})
 			// #endif
 		},
+		toBindPhone: function(){
+			uni.navigateTo({ url: '/pages/login/phone' });
+		},
+		showService: function(){
+			let that = this;
+			if (!that.customerServiceImg) {
+				that.ajax(that.url.hotWord, "get", {}, function(resp){
+					if (resp.data && resp.data.customerService) {
+						that.customerServiceImg = resp.data.customerService;
+					}
+				});
+			}
+			that.$refs.servicePopup.open('center');
+		},
+		checkUpdate: function(){
+			uni.showModal({
+				title: '版本更新',
+				content: '当前版本 v' + this.appVersion + '，已是最新版本',
+				showCancel: false
+			});
+		},
 		toLogout:function(){
 			uni.showModal({
 				title: '退出登录',
 				content: '确定退出当前账号？',
 				success: (m) => {
 					if (!m.confirm) return;
-					this.isLogin = false;   // 先切状态(v2.1.7:防后续清理异常中断)
+					this.isLogin = false;
 					this.balance = 0;
 					try { uni.removeStorageSync('wanju_token'); uni.removeStorageSync('wanju_nickName'); uni.removeStorageSync('wanju_avatarUrl'); } catch(e){}
 					// #ifdef APP-PLUS
 					try { plus.storage.removeItem('unlocked_'); } catch(e) {}
 					// #endif
 					uni.showToast({icon:'none', title:'已退出'});
-					setTimeout(() => { uni.navigateTo({ url: '/pages/login/login' }); }, 600);  // 直接进登录页(含扫码)
+					setTimeout(() => { uni.navigateTo({ url: '/pages/login/login' }); }, 600);
 				}
 			});
 		},
 		toLogin:function(){
-			this.isWeiXinLogin() ? window.location.href = "/#/pages/login/index" : uni.navigateTo({url: "/pages/login/login"})
+			// #ifdef H5
+			if (this.isWeiXinLogin()) { window.location.href = "/#/pages/login/index"; return; }
+			// #endif
+			uni.navigateTo({url: "/pages/login/login"})
 		},
 		isWeiXinLogin() {
 		    // #ifdef H5
 		    var ua = window.navigator.userAgent.toLowerCase();
-		    if (ua.match(/MicroMessenger/i) == 'micromessenger') {
-		        return true; // 微信中打开
-		    } else {
-		        return false; // 普通浏览器中打开
-		    }
+		    return ua.match(/MicroMessenger/i) == 'micromessenger';
 		    // #endif
 		    // #ifndef H5
-		    return false; // APP端永远非微信环境(逻辑层无window)
+		    return false;
 		    // #endif
 		},
 		toPaidList:function(){
@@ -203,29 +302,14 @@ export default {
 				uni.showToast({icon: 'none',title: '请登录后再操作'});
 				return;
 			}
-			uni.navigateTo({
-				url:'/pages/demand/list'
-			})
+			uni.navigateTo({ url: '/pages/demand/list' })
 		},
 		toInvite() {
 			if (!this.isLogin) {
 				uni.showToast({icon: 'none',title: '请登录后再操作'});
 				return;
 			}
-			uni.navigateTo({
-				url:'/pages/invite/index'
-			})
-		},
-		// 返回上一级
-		goBack(){
-			let back = getCurrentPages();  
-			 if(back && back.length>1) {  
-			uni.navigateBack({  
-			  delta: 1  
-			});
-			} else {  
-			history.back();  
-			 }  
+			uni.navigateTo({ url: '/pages/invite/index' })
 		},
 		openVip:function(item){
 			if (!this.isLogin) {
@@ -237,62 +321,42 @@ export default {
 			this.isPay = true;
 		},
 		toPage:function(url){
-			uni.navigateTo({
-				url:url
-			})
+			if (!this.isLogin) {
+				uni.showToast({icon: 'none',title: '请登录后再操作'});
+				return;
+			}
+			uni.navigateTo({ url: url })
 		},
-		closePay: function() {
-			this.isPay = false;
-		},
-		okPay: function() {
-			this.isPay = false;
-			// this.initBalance();
-		},
+		closePay: function() { this.isPay = false; },
+		okPay: function() { this.isPay = false; },
 		loadVipCardList:function(){
 			let that = this
 			that.ajax(that.url.vipCard,"get",{},function(resp){
-				that.vipCardList = resp.data
+				let list = resp.data || [];
+				list.sort(function(a,b){ return a.type - b.type; });
+				that.vipCardList = list;
+				if (that.vipType > 0) that.currentTier = Math.min(that.vipType - 1, list.length - 1);
 			})
 		},
-		tapNav(e) {
-		    const url = e.currentTarget.dataset.url;
-			if (url.includes("http")) {
-				// #ifdef H5
-				window.location.href = url;
-				// #endif
-				// #ifdef APP-PLUS
-				plus.runtime.openURL(url);
-				// #endif
-			} else {
-				uni.navigateTo({
-				    url: url
-				});
-			}
-		},
 		async initPage() {
-			
 			let that = this
 			that.ajax(that.url.menuList, "GET", {type: 6}, function(resp) {
-				 that.navMenu = resp.data;
+				 that.navMenu = resp.data || [];
 			})
 			that.loadVipCardList();
 		},
 		userDetail:function(){
-			
 			let that = this
 			that.ajax(that.url.userDetail, "GET", null, function(resp) {
 				let result = resp.data;
-				if (result.avatarUrl) {
-					that.avatarUrl = result.avatarUrl;
-				}
-				that.name = result.name;
+				if (result.avatarUrl) that.avatarUrl = result.avatarUrl;
+				if (result.name) { that.nickName = result.name; uni.setStorageSync('wanju_nickName', result.name); }
 				that.balance = result.balance;
 				that.vipType = result.vipType;
 				that.vipExpireTime = result.vipExpireTime;
-				that.current = result.vipType - 1;
+				if (that.vipType > 0) that.currentTier = Math.min(that.vipType - 1, Math.max(that.vipCardList.length - 1, 0));
 			})
-		},
-		
+		}
     }
 };
 </script>
