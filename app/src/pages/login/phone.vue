@@ -74,9 +74,12 @@
 	.content {
 		display: flex;
 		flex-direction: column;
-		justify-content:center;
+		justify-content: center;
 		font-size: 15px;
-		background-color: white;
+		background-color: #fff;
+		/* 2026-09-14: APP端垂直居中修复——不再依赖scoped的uni-page-body{height:100%}(APP不生效导致内容顶格"自动往上") */
+		height: 100vh;
+		box-sizing: border-box;
 	}
 	.head-title{
 		font-size: 36rpx;
@@ -138,15 +141,9 @@
 	    padding: 0 60rpx;
 	}
 	
-	uni-page-body{
-		height: 100%;  
-		background: center;
-	}
-	.content{
-		background-color: transparent !important;
-	}
+	/* uni-page-body高度链在APP端不可靠(scoped选择器不命中),高度改由.content的100vh承担 */
 	#content-new{
-		height: 100%;  
+		height: 100vh;
 	}
 	#content-new .data-v-b237504{
 		/* background: url('../../static/images/bg/dlbg.png'); */

@@ -201,6 +201,11 @@ page {
 	background: linear-gradient(135deg, #3d8bff, #1a56c4);
 	flex-shrink: 0;
 }
+/* 已绑定态:灰底只读(张总令:已绑定只显示不可再改) */
+.bind-btn.bound {
+	color: #5a7fae;
+	background: #e8f0fa;
+}
 /* 余额 */
 .wallet-row {
 	display: flex;
@@ -476,10 +481,16 @@ page {
 	padding: 6rpx 18rpx;
 	border-radius: 999rpx;
 	background: rgba(255, 217, 138, .08);
+	white-space: nowrap;
+	flex-shrink: 0;
 }
 .m-expire {
 	font-size: 20rpx;
 	opacity: .75;
+	white-space: nowrap;
+	overflow: hidden;
+	text-overflow: ellipsis;
+	min-width: 0;
 }
 .m-go {
 	font-size: 26rpx;
@@ -489,6 +500,8 @@ page {
 	padding: 16rpx 40rpx;
 	border-radius: 999rpx;
 	box-shadow: 0 8rpx 24rpx rgba(10, 25, 60, .30);
+	white-space: nowrap;
+	flex-shrink: 0;
 }
 
 /* ============ 会员特权(线上真实菜单) ============ */

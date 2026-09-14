@@ -1,6 +1,7 @@
 <script>
 	// 2026-09-06 v2.1.13: uniPush2.0客户端——cid上报(qyai-feed) + 通知点击跳转
-	// 离线打包iOS: Push模块由CI加Push Notifications/Background Modes capability
+	// 2026-09-14 v2.2.1: 加Push模块守卫——CI离线打包Podfile从未加Push模块(原注释"CI加capability"未兑现),
+	//   无模块时调uni.onPushMessage/getPushClientId会弹HTML5+ Runtime"打包时未添加Push模块"报错(张总装机实测)
 	var PUSH_BIND_URL = 'https://qyai001.cn/data/api/qyai-feed/push/bind';
 	export default {
 		onLaunch: function() {
@@ -18,6 +19,17 @@
 		// #ifdef APP-PLUS
 		methods: {
 			initPush: function() {
+				// 0) 模块守卫:打包未含Push模块时plus.push为undefined,直接跳过(不触发原生报错弹窗)
+				//    真启用推送需:Podfile加Push模块+profile开aps-environment+DCloud控制台开通uniPush
+				try {
+					if (!(window.plus && plus.push)) {
+						console.log('[push] 打包未含Push模块,跳过推送初始化')
+						return
+					}
+				} catch (e) {
+					console.log('[push] 守卫判断异常,保守跳过', e)
+					return
+				}
 				// 1) 统一监听:前台收到(res.type=receive)不弹本地(服务端已走APNs弹)——只处理点击
 				try {
 					uni.onPushMessage(function(res) {

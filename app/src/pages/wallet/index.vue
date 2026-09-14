@@ -22,13 +22,23 @@
 						<text class="vip-badge" v-if="vipType > 0">{{ vipTypeName }}</text>
 					</view>
 					<view class="uc-name" v-else><text class="uname">立即登录</text></view>
-					<view class="uc-sub" v-if="isLogin && vipType > 0 && vipExpireTime">有效期至 {{ vipExpireTime }}</view>
+					<view class="uc-sub" v-if="isLogin && vipType > 0 && vipExpireTime">有效期至 {{ (vipExpireTime || '').slice(0, 10) }}</view>
 					<view class="uc-sub" v-else-if="isLogin">开通会员享受更多权益</view>
 					<view class="uc-sub" v-else>登录后查看会员信息</view>
 				</view>
 			</view>
-			<!-- 微信绑定行:跳手机号绑定页(/user/bindphone) -->
-			<view class="bind-row" v-if="isLogin" @tap="toBindPhone">
+			<!-- 微信绑定行:已绑定→只读显示手机号;未绑定→去绑定(张总2026-09-14令) -->
+			<view class="bind-row" v-if="isLogin && phone" @tap="phoneBoundTip">
+				<view class="wx-ico">
+					<image class="wx-svg" src="/static/wx-white.png" mode="aspectFit"></image>
+				</view>
+				<view class="bind-txt">
+					<view class="bt-main">手机号已绑定</view>
+					<view class="bt-sub">{{ maskedPhone }} · 可用手机号登录APP</view>
+				</view>
+				<view class="bind-btn bound">已绑定</view>
+			</view>
+			<view class="bind-row" v-else-if="isLogin" @tap="toBindPhone">
 				<view class="wx-ico">
 					<image class="wx-svg" src="/static/wx-white.png" mode="aspectFit"></image>
 				</view>
@@ -91,7 +101,7 @@
 				</view>
 				<view class="m-foot">
 					<view class="m-discount">超出享 {{ tierDiscount[currentCard.type] || '' }} 折</view>
-					<view class="m-expire" v-if="vipType == currentCard.type && vipExpireTime">有效期至 {{ vipExpireTime }}</view>
+					<view class="m-expire" v-if="vipType == currentCard.type && vipExpireTime">有效期至 {{ (vipExpireTime || '').slice(0, 10) }}</view>
 					<view class="m-expire" v-else>未开通</view>
 					<view class="m-go" @tap="openVip(currentCard)">{{ vipType == currentCard.type && vipExpireTime ? '立即续费' : '立即开通' }}</view>
 				</view>
@@ -100,7 +110,7 @@
 			<!-- 会员特权(线上真实菜单 type=6) -->
 			<view class="perk-card" v-if="navMenu.length > 0">
 				<view class="perk" v-for="(menuItem, idx) in navMenu" :key="idx">
-					<view class="perk-ico"><image class="perk-img" :src="imagebaseurl + menuItem.img" mode="aspectFit"></image></view>
+					<view class="perk-ico"><image class="perk-img" :src="ossImg(menuItem.img)" mode="aspectFit"></image></view>
 					<view class="perk-t">{{ menuItem.title }}</view>
 				</view>
 			</view>
@@ -155,8 +165,9 @@
 		<uni-popup ref="servicePopup" background-color="#fff">
 			<view class="service-pop">
 				<view class="service-title">联系客服</view>
-				<image class="service-img" v-if="customerServiceImg" :src="imagebaseurl + customerServiceImg" mode="widthFix"></image>
-				<view class="service-tip">扫码添加客服微信</view>
+				<image class="service-img" v-if="customerServiceImg" :src="ossImg(customerServiceImg)" mode="widthFix" @error="serviceImgErr = true"></image>
+				<view class="service-tip" v-if="serviceImgErr">二维码加载失败，请稍后再试</view>
+				<view class="service-tip" v-else>扫码添加客服微信</view>
 			</view>
 		</uni-popup>
 
@@ -192,8 +203,10 @@ export default {
 			payOrderId: 0,
 			payAmount: 0,
 			isLogin: false,
-			appVersion: '2.2.0',
+			appVersion: '2.2.1',
 			customerServiceImg: '',
+			serviceImgErr: false,
+			phone: '',
 			// 折扣口径: 2026-09-14 张总定 月9折/季8折/年5折
 			tierDiscount: { 1: '9', 2: '8', 3: '5' },
 			tierEng: { 1: 'MONTHLY', 2: 'QUARTERLY', 3: 'ANNUAL · 尊享' }
@@ -202,6 +215,13 @@ export default {
 	computed: {
 		vipTypeName() {
 			return ({ 1: '月卡会员', 2: '季卡会员', 3: '年卡会员' })[this.vipType] || '';
+		},
+		maskedPhone() {
+			// 已绑定手机号默认打码显示(135****4157);非11位号码(境外格式)保底前3后4
+			var p = this.phone || '';
+			if (!p) return '';
+			if (p.length < 8) return p;
+			return p.slice(0, 3) + '****' + p.slice(-4);
 		},
 		currentCard() {
 			return this.vipCardList[this.currentTier] || null;
@@ -245,7 +265,18 @@ export default {
 			// #endif
 		},
 		toBindPhone: function(){
+			if (this.phone) { this.phoneBoundTip(); return; }
 			uni.navigateTo({ url: '/pages/login/phone' });
+		},
+		phoneBoundTip: function(){
+			uni.showToast({ icon: 'none', title: '已绑定 ' + this.maskedPhone + '，无需重复绑定' });
+		},
+		ossImg: function(key){
+			// OSS日期键(2026-05-31/xxx.jpeg)拼真源;http(s)完整URL直用;comm/images老键走本地upload
+			if (!key) return '';
+			if (/^https?:/i.test(key)) return key;
+			if (/^\d{4}-\d{2}-\d{2}\//.test(key)) return 'https://oss.bestpw.cn/' + key;
+			return this.ossUrl + key;
 		},
 		showService: function(){
 			let that = this;
@@ -354,6 +385,7 @@ export default {
 				that.balance = result.balance;
 				that.vipType = result.vipType;
 				that.vipExpireTime = result.vipExpireTime;
+				that.phone = result.phone || '';
 				if (that.vipType > 0) that.currentTier = Math.min(that.vipType - 1, Math.max(that.vipCardList.length - 1, 0));
 			})
 		}
