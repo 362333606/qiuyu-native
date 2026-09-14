@@ -34,7 +34,7 @@
 				</view>
 				<view class="bind-txt">
 					<view class="bt-main">手机号已绑定</view>
-					<view class="bt-sub">{{ maskedPhone }} · 可用手机号登录APP</view>
+					<view class="bt-sub">{{ maskedPhone }} · 可登录APP</view>
 				</view>
 				<view class="bind-btn bound">已绑定</view>
 			</view>
