@@ -155,6 +155,9 @@ jobs:
           plutil -replace CFBundleName -string "球域AI" "$APP_ROOT/HBuilder-Hello-Info.plist"
           # 出口合规(TestFlight分发前置20260905):声明只用系统HTTPS不含自研加密,防合规问询卡审
           plutil -replace ITSAppUsesNonExemptEncryption -bool false "$APP_ROOT/HBuilder-Hello-Info.plist"
+          # 20260914 ASC交付警告修复(build42邮件): ITMS-90738定位描述空串+ITMS-90068最低13.0(2027春起强制15.0)
+          plutil -replace NSLocationWhenInUseUsageDescription -string "用于根据您所在地区提供更贴合的赛事信息服务" "$APP_ROOT/HBuilder-Hello-Info.plist"
+          plutil -replace MinimumOSVersion -string "15.0" "$APP_ROOT/HBuilder-Hello-Info.plist"
           # 本地化显示名——zh-Hans.lproj/InfoPlist.strings里demo默认"HBuilder 你好"会覆盖Info.plist(张总手机中文系统实测显示hbuilder你好),必须一并改写
           printf '/* Localized versions of Info.plist keys */\nCFBundleDisplayName="球域AI";\n' > "$APP_ROOT/zh-Hans.lproj/InfoPlist.strings"
           printf '/* Localized versions of Info.plist keys */\nCFBundleDisplayName="球域AI";\n' > "$APP_ROOT/en.lproj/InfoPlist.strings"
