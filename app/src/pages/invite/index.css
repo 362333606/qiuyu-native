@@ -1,36 +1,240 @@
+/* 邀请返佣页（2026-09-18 重做，白蓝渐变设计语言，与H5同款） */
 page {
-    background-color: white;
+    background: linear-gradient(180deg, #f7fafd 0%, #ffffff 46%, #eef4fa 100%);
 }
-.container {
+.iv-page {
+    min-height: 100vh;
+    padding-bottom: calc(60rpx + env(safe-area-inset-bottom));
+    color: #17263b;
+    overflow: hidden;
+    font-family: -apple-system, BlinkMacSystemFont, 'PingFang SC', 'Helvetica Neue', sans-serif;
+}
+.iv-head {
+    position: relative;
+    background: linear-gradient(180deg, #438cda 0%, #2f7dcb 100%);
+    padding: 36rpx 36rpx 116rpx;
+    color: #fff;
+    overflow: hidden;
+}
+.iv-deco1 {
+    position: absolute;
+    width: 300rpx;
+    height: 300rpx;
+    right: -80rpx;
+    top: -92rpx;
+    border-radius: 50%;
+    background: rgba(255,255,255,.1);
+    pointer-events: none;
+}
+.iv-deco2 {
+    position: absolute;
+    width: 240rpx;
+    height: 240rpx;
+    left: -104rpx;
+    bottom: -116rpx;
+    border-radius: 50%;
+    background: rgba(255,255,255,.07);
+    pointer-events: none;
+}
+.iv-eng-label {
+    position: relative;
+    z-index: 1;
+    font-size: 20rpx;
+    letter-spacing: 6rpx;
+    opacity: .75;
+    font-weight: 600;
+}
+.iv-head-name {
+    position: relative;
+    z-index: 1;
+    font-size: 44rpx;
+    font-weight: 800;
+    margin-top: 6rpx;
+    letter-spacing: 4rpx;
+}
+.iv-card {
+    background: #fff;
+    border-radius: 32rpx;
+    box-shadow: 0 16rpx 40rpx rgba(47,125,203,.08);
+    margin: 32rpx 28rpx 0;
+    padding: 32rpx;
+    position: relative;
+    z-index: 2;
+}
+.iv-banner-card { padding: 24rpx; }
+.iv-banner {
     width: 100%;
+    border-radius: 24rpx;
+    display: block;
 }
-.invite-content{
-	position: fixed;
-	top: 50%;
-	display: flex;
-	align-items: center;
-	margin-left: 60rpx;
+.iv-qr-card {
+    margin-top: -76rpx;
+    text-align: center;
+    padding: 40rpx 32rpx 36rpx;
 }
-.invite-text{
-	padding: 20rpx 30rpx;
-	background-color: white;
-	font-size: 34rpx;
-	border-radius: 40rpx;
-	margin-left: 30rpx;
+.iv-qr-wrap {
+    width: 344rpx;
+    height: 344rpx;
+    margin: 4rpx auto 0;
+    border: 2rpx solid #e8eef5;
+    border-radius: 28rpx;
+    padding: 18rpx;
+    background: #fff;
+    box-sizing: border-box;
 }
-.invite-list{
-	margin-left: 30rpx;
-	margin-top: 40rpx;
-	font-size: 32rpx;
-	text-align: center;
-	text-decoration:underline;
+.iv-qr-tip {
+    font-size: 24rpx;
+    color: #8a97a8;
+    margin-top: 20rpx;
 }
-image{
-	position: absolute;
-	left: 0;
-	bottom: 0;
-	display: block;
-	width: 100%;
-	height: 100%;
-	z-index: -999;
+.iv-code-row {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 20rpx;
+    margin-top: 28rpx;
+}
+.iv-code-pill {
+    font-size: 30rpx;
+    font-weight: 800;
+    color: #1a56c4;
+    letter-spacing: 4rpx;
+    background: #eef5fd;
+    border: 2rpx dashed #b9d4f2;
+    border-radius: 999px;
+    padding: 16rpx 40rpx;
+    white-space: nowrap;
+}
+.iv-copy-btn {
+    font-size: 24rpx;
+    font-weight: 700;
+    color: #fff;
+    padding: 16rpx 32rpx;
+    border-radius: 999px;
+    background: linear-gradient(135deg, #3d8bff, #1a56c4);
+    box-shadow: 0 8rpx 20rpx rgba(26,86,196,.28);
+    white-space: nowrap;
+}
+.iv-steps {
+    text-align: left;
+    margin-top: 32rpx;
+    border-top: 2rpx dashed #e2ebf5;
+    padding-top: 28rpx;
+}
+.iv-step {
+    display: flex;
+    gap: 20rpx;
+    margin-top: 18rpx;
+    align-items: flex-start;
+}
+.iv-step:first-child { margin-top: 0; }
+.iv-step-no {
+    width: 38rpx;
+    height: 38rpx;
+    border-radius: 50%;
+    background: linear-gradient(135deg, #3d8bff, #1a56c4);
+    color: #fff;
+    font-size: 22rpx;
+    font-weight: 800;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+    margin-top: 2rpx;
+}
+.iv-step-t {
+    font-size: 25rpx;
+    color: #526377;
+    line-height: 1.55;
+}
+.iv-b { color: #17263b; font-weight: 700; }
+.iv-sec-head {
+    display: flex;
+    align-items: center;
+    gap: 16rpx;
+    margin: 36rpx 28rpx 22rpx;
+    padding-left: 4rpx;
+}
+.iv-sec-bar {
+    width: 8rpx;
+    height: 30rpx;
+    border-radius: 4rpx;
+    background: linear-gradient(180deg, #3d8bff, #2f7dcb);
+    flex-shrink: 0;
+}
+.iv-sec-title {
+    font-size: 32rpx;
+    font-weight: 800;
+    color: #17263b;
+}
+.iv-sec-eng {
+    font-size: 18rpx;
+    letter-spacing: 5rpx;
+    color: #93a7c0;
+    font-weight: 600;
+}
+.iv-friend-entry {
+    display: flex;
+    align-items: center;
+    gap: 24rpx;
+    padding: 28rpx 32rpx;
+}
+.iv-fe-ico {
+    width: 80rpx;
+    height: 80rpx;
+    border-radius: 50%;
+    flex-shrink: 0;
+    background: linear-gradient(135deg, #e8f2fd, #d7e8fa);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+.iv-fe-ico-core {
+    position: relative;
+    width: 44rpx;
+    height: 40rpx;
+}
+.iv-fe-ico-core::before {
+    content: '';
+    position: absolute;
+    left: 12rpx;
+    top: 0;
+    width: 20rpx;
+    height: 20rpx;
+    border-radius: 50%;
+    background: #2f7dcb;
+}
+.iv-fe-ico-core::after {
+    content: '';
+    position: absolute;
+    left: 2rpx;
+    bottom: 0;
+    width: 40rpx;
+    height: 20rpx;
+    border-radius: 20rpx 20rpx 0 0;
+    background: #2f7dcb;
+}
+.iv-fe-info { flex: 1; min-width: 0; }
+.iv-fe-t {
+    font-size: 28rpx;
+    font-weight: 700;
+    color: #17263b;
+}
+.iv-fe-s {
+    font-size: 22rpx;
+    color: #8a97a8;
+    margin-top: 6rpx;
+}
+.iv-fe-arrow {
+    color: #c3cede;
+    font-size: 36rpx;
+    font-weight: 300;
+    flex-shrink: 0;
+}
+.iv-foot {
+    text-align: center;
+    font-size: 20rpx;
+    color: #b6c4d4;
+    letter-spacing: 2rpx;
+    margin-top: 36rpx;
 }

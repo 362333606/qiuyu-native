@@ -1,31 +1,54 @@
 <template>
-    <view style="height: 100%">
-        
-		<view class="no-order" v-if="orderList.length == 0" style="text-align: center;">
-		    <image src="/static/images/no-order.png" class="no-order-img"></image>
-		    <view class="text" style="font-size: 20px;">暂无解锁记录</view>
+    <view class="dm-page">
+		<view class="dm-head">
+			<view class="dm-deco1"></view>
+			<view class="dm-deco2"></view>
+			<view class="dm-eng-label">QIUYU AI · UNLOCK RECORDS</view>
+			<view class="dm-head-name">已解锁赛事</view>
 		</view>
-		<view class="order-list" v-if="orderList.length > 0">
-		    <view :class="item.isToday == true ? 'order-item order-item-click' : 'order-item order-item-disable'" 
-			v-for="(item, index) in orderList" :key="index" @click="toDetail(item.code,item.isToday)">
-				<view class="goods-content">
-					<view class="goods-info" style="flex: 2;">
-						<view>
-							<text class="goods-name">{{item.goodsName}}</text>
-						</view>
-						<view style="margin-top: 20rpx;">
-							<text style="color: #f45656;font-size: 22rpx;">
-							<text class="demand-item-price mount-family">{{item.price}}</text>金币</text>
-							<text style="font-size: 22rpx;margin-left: 20rpx;">{{item.createDate}}</text>
-						</view>
-					</view>
-					<view class="goods-img" style="flex: 1;">
-						<image class="img" mode="aspectFill" :src="imagebaseurl+item.goodsImg" style="width: 50px;height: 50px;"></image>
+
+		<view class="dm-card dm-empty" v-if="orderList.length == 0">
+			<view class="dm-empty-ico"><view class="dm-empty-ico-in"></view></view>
+			<view class="dm-empty-t">暂无解锁记录</view>
+			<view class="dm-empty-s">解锁的赛事将显示在这里，当日解锁可回看解析</view>
+		</view>
+
+		<view class="dm-card" v-if="todayList.length > 0">
+			<view class="dm-day-tag"><view class="dm-day-dot"></view>今天 · {{todayStr}}</view>
+			<view class="dm-order" v-for="(item, index) in todayList" :key="'t'+index" @click="toDetail(item.code,item.isToday)">
+				<view class="od-info">
+					<view class="od-name">{{item.goodsName}}</view>
+					<view class="od-meta">
+						<text class="od-price"><text class="od-price-b">{{item.price}}</text> 金币</text>
+						<text class="od-date">{{(item.createDate||'').slice(0,16)}}</text>
 					</view>
 				</view>
-		    </view>
+				<view class="od-img">
+					<image v-if="item.goodsImg" mode="aspectFill" :src="imagebaseurl+item.goodsImg"></image>
+				</view>
+				<view class="od-arrow">›</view>
+			</view>
 		</view>
-		
+
+		<view class="dm-card" v-if="earlierList.length > 0">
+			<view class="dm-day-tag dm-day-dim"><view class="dm-day-dot dm-day-dot-dim"></view>更早</view>
+			<view class="dm-order dm-order-dim" v-for="(item, index) in earlierList" :key="'e'+index">
+				<view class="od-info">
+					<view class="od-name">{{item.goodsName}}</view>
+					<view class="od-meta">
+						<text class="od-price"><text class="od-price-b">{{item.price}}</text> 金币</text>
+						<text class="od-date">{{(item.createDate||'').slice(0,16)}}</text>
+					</view>
+				</view>
+				<view class="od-img">
+					<image v-if="item.goodsImg" mode="aspectFill" :src="imagebaseurl+item.goodsImg"></image>
+				</view>
+				<view class="od-arrow">›</view>
+			</view>
+		</view>
+
+		<view class="dm-tip" v-if="orderList.length > 0">仅当日已解锁赛事可回看解析内容，判定结果以赛事官方判定为准</view>
+		<view class="dm-foot">球域AI · 判定结果以赛事官方为准</view>
     </view>
 </template>
 
@@ -40,6 +63,20 @@ export default {
 		   imagebaseurl: this.ossUrl,
         };
     },
+    computed: {
+		todayList() {
+			return this.orderList.filter(item => item.isToday);
+		},
+		earlierList() {
+			return this.orderList.filter(item => !item.isToday);
+		},
+		todayStr() {
+			let d = new Date();
+			let m = d.getMonth() + 1;
+			let day = d.getDate();
+			return d.getFullYear() + '-' + (m < 10 ? '0' : '') + m + '-' + (day < 10 ? '0' : '') + day;
+		}
+	},
     onLoad: function (options) {
 		if(options.token) {
 		  uni.setStorageSync("wanju_token", options.token);
@@ -95,7 +132,7 @@ export default {
 			}
 			ref.ajax(ref.url.orderList, "GET", data, function(resp) {
 				let result = resp.data.content
-				result.map
+				result = result == null ? [] : result
 				result = result.map(item => {
 					return {
 					  ...item,
@@ -108,13 +145,6 @@ export default {
 				}else{
 					if (ref.page == 1) ref.orderList = []
 					ref.orderList = ref.orderList.concat(result)
-					console.info(ref.orderList)
-					if (ref.page > 1){
-						// uni.showToast({
-						// 	icon:'none',
-						// 	title:"又加载了" + result.length + "个项目"
-						// })
-					}
 				}
 			})
 		},
@@ -122,18 +152,18 @@ export default {
 		  // 如果参数是字符串，转换为Date对象
 		  const d1 = typeof date1 === 'string' ? new Date(date1) : date1;
 		  const d2 = typeof date2 === 'string' ? new Date(date2) : date2;
-		  
+
 		  // 检查是否是有效的Date对象
 		  if (isNaN(d1.getTime()) || isNaN(d2.getTime())) {
-		    console.error('Invalid date provided');
-		    return false;
+			console.error('Invalid date provided');
+			return false;
 		  }
-		  
+
 		  // 比较年月日
 		  return (
-		    d1.getFullYear() === d2.getFullYear() &&
-		    d1.getMonth() === d2.getMonth() &&
-		    d1.getDate() === d2.getDate()
+			d1.getFullYear() === d2.getFullYear() &&
+			d1.getMonth() === d2.getMonth() &&
+			d1.getDate() === d2.getDate()
 		  );
 		}
     }
