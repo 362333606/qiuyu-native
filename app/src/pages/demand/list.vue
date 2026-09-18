@@ -1,58 +1,104 @@
 <template>
     <view class="dm-page">
-		<view class="dm-head">
-			<view class="dm-deco1"></view>
-			<view class="dm-deco2"></view>
-			<view class="dm-eng-label">QIUYU AI · UNLOCK RECORDS</view>
-			<view class="dm-head-name">已解锁赛事</view>
+		<view class="dm-hero">
+			<view class="dm-hero-glow"></view>
+			<view class="dm-hero-dots"></view>
+			<view class="dm-brand-row">
+				<image class="dm-brand-logo" src="/static/qiuyu-logo-w.png" mode="aspectFit"></image>
+				<view class="dm-date-chip">{{todayCn}}</view>
+			</view>
+			<view class="dm-hero-title">解锁记录</view>
+			<view class="dm-hero-sub">当日解锁的赛事 <text class="dm-hero-sub-b">可回看完整AI解析</text></view>
 		</view>
 
-		<view class="dm-card dm-empty" v-if="orderList.length == 0">
-			<view class="dm-empty-ico"><view class="dm-empty-ico-in"></view></view>
-			<view class="dm-empty-t">暂无解锁记录</view>
-			<view class="dm-empty-s">解锁的赛事将显示在这里，当日解锁可回看解析</view>
+		<view class="dm-empty-stage" v-if="orderList.length == 0">
+			<view class="dm-es-orbit">
+				<view class="dm-es-ball"></view>
+				<view class="dm-es-badge"></view>
+			</view>
+			<view class="dm-es-t">还没有解锁记录</view>
+			<view class="dm-es-s">解锁赛事即可查看AI深度解析，当日解锁当日随时回看</view>
+			<view class="dm-es-go" @click="goHome">去解锁赛事</view>
 		</view>
 
-		<view class="dm-card" v-if="todayList.length > 0">
-			<view class="dm-day-tag"><view class="dm-day-dot"></view>今天 · {{todayStr}}</view>
-			<view class="dm-order" v-for="(item, index) in todayList" :key="'t'+index" @click="toDetail(item.code,item.isToday)">
-				<view class="od-info">
-					<view class="od-name">{{item.goodsName}}</view>
-					<view class="od-meta">
-						<text class="od-price"><text class="od-price-b">{{item.price}}</text> 金币</text>
-						<text class="od-date">{{(item.createDate||'').slice(0,16)}}</text>
+		<block v-if="orderList.length > 0">
+			<view class="dm-stats-glass">
+				<view class="dm-sg dm-sg-blue">
+					<view class="dm-sg-num">{{todayCount}}<text class="dm-sg-unit">场</text></view>
+					<view class="dm-sg-lab">今日解锁</view>
+				</view>
+				<view class="dm-sg dm-sg-gold">
+					<view class="dm-sg-num">{{todayCost}}<text class="dm-sg-unit">金币</text></view>
+					<view class="dm-sg-lab">今日支出</view>
+				</view>
+				<view class="dm-sg">
+					<view class="dm-sg-num">{{archivedCount}}<text class="dm-sg-unit">场</text></view>
+					<view class="dm-sg-lab">已归档</view>
+				</view>
+			</view>
+
+			<block v-if="todayList.length > 0">
+				<view class="dm-sec">
+					<view class="dm-sec-bar"></view>
+					<view class="dm-sec-t">今日解锁</view>
+					<view class="dm-sec-e">TODAY</view>
+					<view class="dm-sec-r"><text class="dm-sec-r-b">{{todayCount}}</text> 场可回看</view>
+				</view>
+				<view class="dm-today-list">
+					<view class="dm-m-card" v-for="(item, index) in todayList" :key="'t'+index" @click="toDetail(item.code,item.isToday)">
+						<view class="dm-m-thumb">
+							<image class="dm-m-thumb-img" v-if="item.goodsImg" :src="imagebaseurl+item.goodsImg" mode="aspectFill"></image>
+						</view>
+						<view class="dm-m-info">
+							<view><text class="dm-lg-chip">今日可回看</text></view>
+							<view class="dm-m-name">{{item.goodsName}}</view>
+							<view class="dm-m-meta">
+								<text class="dm-m-price"><text class="dm-m-price-b">{{item.price}}</text> 金币</text>
+								<text class="dm-m-time">{{unlockTime(item)}}</text>
+							</view>
+						</view>
+						<view class="dm-play"></view>
 					</view>
 				</view>
-				<view class="od-img">
-					<image v-if="item.goodsImg" mode="aspectFill" :src="imagebaseurl+item.goodsImg"></image>
-				</view>
-				<view class="od-arrow">›</view>
-			</view>
-		</view>
+			</block>
 
-		<view class="dm-card" v-if="earlierList.length > 0">
-			<view class="dm-day-tag dm-day-dim"><view class="dm-day-dot dm-day-dot-dim"></view>更早</view>
-			<view class="dm-order dm-order-dim" v-for="(item, index) in earlierList" :key="'e'+index">
-				<view class="od-info">
-					<view class="od-name">{{item.goodsName}}</view>
-					<view class="od-meta">
-						<text class="od-price"><text class="od-price-b">{{item.price}}</text> 金币</text>
-						<text class="od-date">{{(item.createDate||'').slice(0,16)}}</text>
+			<block v-if="earlierList.length > 0">
+				<view class="dm-sec">
+					<view class="dm-sec-bar"></view>
+					<view class="dm-sec-t">往日解锁</view>
+					<view class="dm-sec-e">ARCHIVE</view>
+					<view class="dm-sec-r">已归档 <text class="dm-sec-r-b">{{archivedCount}}</text> 场</view>
+				</view>
+				<view class="dm-arch-card">
+					<view class="dm-arch-head">
+						<view class="dm-arch-ico"></view>
+						<view class="dm-arch-t">往日记录仅作留存</view>
+						<view class="dm-arch-c">共 {{archivedCount}} 场</view>
+					</view>
+					<view class="dm-arch-row" v-for="(item, index) in earlierList" :key="'e'+index">
+						<view class="dm-ar-thumb">
+							<image class="dm-ar-thumb-img" v-if="item.goodsImg" :src="imagebaseurl+item.goodsImg" mode="aspectFill"></image>
+						</view>
+						<view class="dm-ar-info">
+							<view class="dm-ar-name">{{item.goodsName}}</view>
+							<view class="dm-ar-meta">
+								<text class="dm-ar-price"><text class="dm-ar-price-b">{{item.price}}</text> 金币</text>
+								<text class="dm-ar-time">{{archTime(item)}}</text>
+							</view>
+						</view>
+						<view class="dm-ar-lock">已归档</view>
 					</view>
 				</view>
-				<view class="od-img">
-					<image v-if="item.goodsImg" mode="aspectFill" :src="imagebaseurl+item.goodsImg"></image>
-				</view>
-				<view class="od-arrow">›</view>
-			</view>
-		</view>
+			</block>
 
-		<view class="dm-tip" v-if="orderList.length > 0">仅当日已解锁赛事可回看解析内容，判定结果以赛事官方判定为准</view>
-		<view class="dm-foot">球域AI · 判定结果以赛事官方为准</view>
+			<view class="dm-tip">当日解锁的赛事当天可反复回看解析内容，判定结果以赛事官方为准</view>
+		</block>
+		<view class="dm-foot">QIUYU AI · UNLOCK HISTORY</view>
     </view>
 </template>
 
 <script>
+// 解锁记录页（2026-09-18 v2重设计·张总批稿，与H5 chunk 909cfbd1 同款）
 export default {
     data() {
         return {
@@ -69,6 +115,21 @@ export default {
 		},
 		earlierList() {
 			return this.orderList.filter(item => !item.isToday);
+		},
+		todayCount() {
+			return this.todayList.length;
+		},
+		archivedCount() {
+			return this.earlierList.length;
+		},
+		todayCost() {
+			let sum = this.todayList.reduce((acc, item) => acc + (parseFloat(item.price) || 0), 0);
+			return Math.round(sum * 10) / 10;
+		},
+		todayCn() {
+			let d = new Date();
+			let wk = ['周日','周一','周二','周三','周四','周五','周六'];
+			return (d.getMonth() + 1) + '月' + d.getDate() + '日 ' + wk[d.getDay()];
 		},
 		todayStr() {
 			let d = new Date();
@@ -87,29 +148,7 @@ export default {
 		}
 		this.getList();
     },
-    /**
-     * 生命周期函数--监听页面初次渲染完成
-     */
-    onReady: function () {},
-    /**
-     * 生命周期函数--监听页面显示
-     */
     onShow: function () {},
-    /**
-     * 生命周期函数--监听页面隐藏
-     */
-    onHide: function () {},
-    /**
-     * 生命周期函数--监听页面卸载
-     */
-    onUnload: function () {},
-    /**
-     * 页面相关事件处理函数--监听用户下拉动作
-     */
-    onPullDownRefresh: function () {},
-    /**
-     * 页面上拉触底事件的处理函数
-     */
     onReachBottom: function () {
 		let that = this
 		if (that.isLastPage) return
@@ -123,6 +162,24 @@ export default {
 					url:'/pages/demand/payContent?code='+code
 				})
 			}
+		},
+		goHome:function(){
+			uni.switchTab({
+				url:'/pages/match/index'
+			});
+		},
+		unlockTime:function(item){
+			let s = (item.createDate || '');
+			return s.length >= 16 ? s.slice(11, 16) + ' 解锁' : '';
+		},
+		archTime:function(item){
+			let s = (item.createDate || '');
+			if (s.length >= 16) {
+				let m = parseInt(s.slice(5, 7), 10);
+				let d = parseInt(s.slice(8, 10), 10);
+				return m + '月' + d + '日 ' + s.slice(11, 16);
+			}
+			return s;
 		},
 		getList() {
 			let ref = this
