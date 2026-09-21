@@ -67,6 +67,10 @@ jobs:
       # ── 3. 组装: www + control.xml + bundle id + 图标 + scheme ──
       - name: Assemble project
         run: |
+          # 版本单一真源:manifest.json versionName(build46教训=workflow硬编码2.2.1,ASC里43/44/46全标2.2.1没法区分)
+          APPVER=$(python3 -c "import re;print(re.search(r'\"versionName\"\s*:\s*\"([^\"]+)\"',open('app/src/manifest.json',encoding='utf-8').read()).group(1))")
+          echo "APPVER=$APPVER" >> "$GITHUB_ENV"
+          echo "manifest版本=$APPVER"
           HB=/tmp/sdk/out/SDK/HBuilder-Hello
           APP_ROOT="$HB/HBuilder-Hello"
           APP_DIR="$APP_ROOT/Pandora/apps/$APPID"
@@ -79,7 +83,7 @@ jobs:
           <?xml version="1.0" encoding="utf-8"?>
           <HBuilder debug="false" version="5.25.2026082902">
             <apps>
-              <app appid="$APPID" appver="2.2.1" appkey="$APPKEY"/>
+              <app appid="$APPID" appver="$APPVER" appkey="$APPKEY"/>
             </apps>
           </HBuilder>
           XML
@@ -274,7 +278,7 @@ jobs:
             -destination 'generic/platform=iOS' \
             -archivePath "$RUNNER_TEMP/QiuYuAI.xcarchive" \
             CURRENT_PROJECT_VERSION="$BUILD_NUMBER" \
-            MARKETING_VERSION=2.2.1 \
+            MARKETING_VERSION="$APPVER" \
             CODE_SIGN_STYLE=Manual \
             PROVISIONING_PROFILE="$PROFILE_UUID" \
             PROVISIONING_PROFILE_SPECIFIER="$PROFILE_UUID" \
