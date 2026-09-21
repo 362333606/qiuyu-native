@@ -1,6 +1,15 @@
 {
     "pages" : [
 		{
+		    "path" : "pages/web/matchv2",
+		    "style" : {
+		        "navigationBarTitleText" : "赛事",
+		        "navigationBarBackgroundColor" : "#2f7dcb",
+		        "navigationBarTextStyle" : "white"
+		    }
+		},
+
+		{
 		    "path" : "pages/match/index",
 		    "style" : {
 		        "navigationBarTitleText" : "球域Ai",
@@ -17,14 +26,8 @@
 		    "path" : "pages/web/expertv2",
 		    "style" : {
 		        "navigationBarTitleText" : "AI专家",
-				"navigationStyle": "custom"
-		    }
-		},
-		{
-		    "path" : "pages/web/matchv2",
-		    "style" : {
-		        "navigationBarTitleText" : "赛事",
-				"navigationStyle": "custom"
+		        "navigationBarBackgroundColor" : "#2f7dcb",
+		        "navigationBarTextStyle" : "white"
 		    }
 		},
 		{
