@@ -26,12 +26,18 @@ page {
 	background-color: #e1eaff;
 	text-align: center;
 	margin: 10rpx 10rpx 30rpx 10rpx;
-	height: 90rpx;
+	min-height: 90rpx;
+	padding-bottom: 10rpx;
 	border-radius: 10rpx;
 	font-size: 30rpx;
 }
 .recharge-give-price{
-	font-size: 30rpx;
+	font-size: 24rpx;
+	color: #ff5a1f;
+	font-weight: bold;
+}
+.active .recharge-give-price{
+	color: #ffe08a;
 }
 .recharge-price{
 	margin-top: 10rpx;

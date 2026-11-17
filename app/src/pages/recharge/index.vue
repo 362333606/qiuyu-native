@@ -4,7 +4,7 @@
 		<view class="recharge-container">
 			<view class="recharge-title" style="margin-top: -150rpx;">
 				<image src="/static/money.png" style="width: 200rpx;height: 200rpx;"></image>
-				<text style="font-size: 40rpx;font-weight: bolder;">余额不足，请充值</text>
+				<text style="font-size: 40rpx;font-weight: bolder;">账户充值</text>
 			</view>
 			<!-- <view class="recharge-head">
 				<text class="balance-info">余额：<text>{{balance}}</text></text>
@@ -17,12 +17,13 @@
 					<view class="recharge-price">
 						<text style="font-size: 24rpx;">¥</text>
 						<text>{{item.price}}</text></view>
+					<view class="recharge-give-price" v-if="giveOf(item.price)">送{{giveOf(item.price)}}元</view>
 				</view>
 			</view>
 			<view class="recharge-btn" @tap="pay">确认支付</view>
 			<view class="recharge-desc">
 				<checkbox value="bb" checked="" style="transform: scale(0.7)" />
-				充值即同意<text style="color: #385dd6;" @click="tapNav">《充值服务协议》</text>
+				赠送金额可用于站内消费，不可提现。充值即同意<text style="color: #385dd6;" @click="tapNav">《充值服务协议》</text>
 			</view>
 			
 			
@@ -62,6 +63,10 @@ export default {
 		// this.initBalance();
     },
     methods: {
+		giveOf(price) {
+			// 2026-11-17 张总定：充值赠送档位（与服务器 sys_dict id=33 一致，赠送不可提现）
+			return ({2000: 200, 5000: 750, 10000: 2000, 20000: 4000})[parseInt(price)] || 0;
+		},
 		tapNav() {
 		    uni.navigateTo({
 		        url: '/pages/news/index?id=14'
