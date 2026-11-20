@@ -111,8 +111,10 @@
 			// }
 		},
 		onUnload(){
-			clearInterval(js)
-			this.second = 0;
+			if (this.codeInterval) {
+				clearInterval(this.codeInterval);
+				this.codeInterval = null;
+			}
 		},
 		components: {
 		},
@@ -179,6 +181,7 @@
 					  _this.msgCodeText=code+ ' S'
 					  if(code<0){
 					    clearInterval(_this.codeInterval)
+					    _this.codeInterval = null
 					    _this.msgCodeText='重新发送'
 					    _this.hasSend=false
 					  }

@@ -5,7 +5,11 @@
         <view class="list">
         	<view class="list-call input-new" >
         		<image class="img" src="/static/icon/phone.png"></image> | 
-        		<input class="biaoti" v-model="phoneno" type="text" maxlength="11" placeholder="请输入手机号" />
+        		<input class="biaoti" v-model="phoneno" type="number" maxlength="11" placeholder="请输入手机号" />
+        	</view>
+        	<view class="list-call input-new code-row">
+        		<input class="biaoti code-input" v-model="code" type="number" maxlength="6" placeholder="请输入短信验证码" />
+        		<view class="code-btn" :class="{ disabled: hasSend }" @tap="sendSmsCode">{{ msgCodeText }}</view>
         	</view>
         	
         	<view class="dlbutton" hover-class="dlbutton-hover" @tap="bindLogin()">
@@ -19,18 +23,49 @@
 <script>
 	const app = getApp();
 	export default {
-		onShow(){
-			var that = this
+		onShow(){},
+		onUnload(){
+			if (this.codeInterval) {
+				clearInterval(this.codeInterval);
+				this.codeInterval = null;
+			}
 		},
 		data() {
 			return {
-				phoneno:'',
+				phoneno: '',
+				code: '',
+				hasSend: false,
+				msgCodeText: '获取验证码',
+				codeInterval: null
 			};
 		},
 		methods: {
+			sendSmsCode() {
+				if (this.hasSend) return;
+				if (!(/^1(3|4|5|6|7|8|9)\d{9}$/.test(this.phoneno))) {
+					uni.showToast({ icon: 'none', title: '手机号不正确' });
+					return;
+				}
+				var that = this;
+				this.ajax(this.url.sendCode, "POST", { phone: this.phoneno, type: 1 }, function() {
+					uni.showToast({ title: '验证码已发送' });
+					var sec = 60;
+					that.hasSend = true;
+					that.msgCodeText = sec + 's';
+					that.codeInterval = setInterval(function() {
+						sec--;
+						if (sec <= 0) {
+							clearInterval(that.codeInterval);
+							that.codeInterval = null;
+							that.hasSend = false;
+							that.msgCodeText = '重新获取';
+						} else {
+							that.msgCodeText = sec + 's';
+						}
+					}, 1000);
+				});
+			},
 		    async bindLogin() {
-				
-				// 手机号正则
 				if (!(/^1(3|4|5|6|7|8|9)\d{9}$/.test(this.phoneno))) {
 				     uni.showToast({
 				        icon: 'none',
@@ -38,26 +73,24 @@
 				    });
 				    return;
 				}
-				if (this.phoneno=="") {
+				if (!this.code || !this.code.trim()) {
 				    uni.showToast({
 				        icon: 'none',
-				        title: '请输入登录手机号'
+				        title: '请输入短信验证码'
 				    });
 				    return;
-				} 
+				}
 				uni.showLoading();
-				var that = this;
-				
-				this.ajax(this.url.bindPhone,"POST",{phone: this.phoneno},function(resp){
+				this.ajax(this.url.bindPhone,"POST",{phone: this.phoneno, code: this.code.trim()},function(resp){
 					uni.showToast({
 						title: "绑定手机号成功"
 					});
 					setTimeout(() => {
 					  // #ifdef H5
-					  window.location.href = "/#/pages/chat/index";
+					  window.location.href = "/#/pages/wallet/index";
 					  // #endif
 					  // #ifdef APP-PLUS
-					  uni.switchTab({url: "/pages/qa/index"});
+					  uni.switchTab({url: "/pages/wallet/index"});
 					  // #endif
 					}, 500);
 				});
@@ -153,6 +186,25 @@
 		margin-right: 10px;
 		width: 17px!important;
 		height: 20px!important;
+	}
+	.code-row{
+		padding: 0 12px 0 18px;
+		box-sizing: border-box;
+	}
+	.code-input{
+		margin-left: 0 !important;
+	}
+	.code-btn{
+		font-size: 13px;
+		color: #2f7dcb;
+		padding: 6px 12px;
+		border-radius: 16px;
+		background: rgba(47, 125, 203, 0.1);
+		white-space: nowrap;
+	}
+	.code-btn.disabled{
+		color: #999;
+		background: #f2f2f2;
 	}
 	.input-new{
 		margin-top: 20px;

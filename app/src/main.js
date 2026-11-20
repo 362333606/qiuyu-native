@@ -69,7 +69,8 @@ Vue.prototype.url={
 	userPayment: "/user/payment",
 	updatePayment: "/user/updatePayment",
 	bindPhone: "/user/bindphone",
-	userInviteList: "/user/inviteList"
+	userInviteList: "/user/inviteList",
+		userLogout: "/user/logout"
 	
 
 }
@@ -100,11 +101,13 @@ Vue.prototype.ajax = function(url, method, data, fun) {
 		data: data,
 		success: function(resp) {
 			uni.hideLoading();
-			if (resp.statusCode == 401) {
-				uni.redirectTo({
-					url: "/pages/login/login"
-				})
-			} else if (resp.statusCode == 200 && resp.data.code == 200) {
+			if (resp.statusCode == 401 || (resp.statusCode == 200 && resp.data && (resp.data.code == 401 || resp.data.code == 501))) {
+				try { uni.removeStorageSync("wanju_token"); } catch (e) {}
+				uni.showToast({ icon: "none", title: (resp.data && resp.data.msg) || "请重新登录" });
+				setTimeout(() => {
+					uni.navigateTo({ url: "/pages/login/login" });
+				}, 400);
+			} else if (resp.statusCode == 200 && resp.data && resp.data.code == 200) {
 				let data = resp.data
 				if (data.hasOwnProperty("wanju_token")) {
 					let token = data.token

@@ -142,7 +142,7 @@
 					}
 					_this.ajax(_this.url.qrCreate, "POST", params, function(res) {
 						if (res && res.data && res.data.qr_url) {
-							_this.qrUrl = 'https://api.qrserver.com/v1/create-qr-code/?data=' + encodeURIComponent(res.data.qr_url) + '&size=220x220';
+							_this.qrUrl = 'https://qyai001.cn/api/qr-img?size=220&data=' + encodeURIComponent(res.data.qr_url);
 							_this.qrOrderNo = res.data.order_no || '';
 							_this.qrShow = true;
 							_this.startQrPoll();
@@ -277,11 +277,13 @@
 					let _this = this;
 					_this.ajax(_this.url.balance,"get",{},function(res){
 						if(res.code == 200){
-							_this.userBalance = res.data.toFixed(2);
-							if (_this.userBalance > 0) {
-								if (_this.payAmount > _this.userBalance) {
+							const balNum = Number(res.data) || 0;
+							const amtNum = Number(_this.payAmount) || 0;
+							_this.userBalance = balNum.toFixed(2);
+							if (balNum > 0) {
+								if (amtNum > balNum) {
 									_this.groupPayType = true;
-									_this.groupReAmount = (_this.payAmount - _this.userBalance).toFixed(2);
+									_this.groupReAmount = (amtNum - balNum).toFixed(2);
 									_this.groupNote = '可用余额为 ' + _this.userBalance + ' 元，需微信支付 ' + _this.groupReAmount + ' 元';
 									_this.payWay = 2;
 								} else {
@@ -296,12 +298,14 @@
 				//微信h5支付
 				funcwechatReday(option) {
 					// var that = this;
+					var _self = this;
+					var _readyCb = function() { _self.onBridgeReady(option); };
 					if (typeof WeixinJSBridge == "undefined") {
 						if (document.addEventListener) {
-							document.addEventListener('WeixinJSBridgeReady', onBridgeReady(option), false);
+							document.addEventListener('WeixinJSBridgeReady', _readyCb, false);
 						} else if (document.attachEvent) {
-							document.attachEvent('WeixinJSBridgeReady', onBridgeReady(option));
-							document.attachEvent('onWeixinJSBridgeReady', onBridgeReady(option));
+							document.attachEvent('WeixinJSBridgeReady', _readyCb);
+							document.attachEvent('onWeixinJSBridgeReady', _readyCb);
 						}
 					} else {
 						this.onBridgeReady(option);
@@ -318,25 +322,29 @@
 						"paySign": option.paySign, //微信签名 
 					},
 					function(res) {
-						uni.showToast({icon: 'none',title: res}); 
-						if (res.err_msg == 'get_brand_wcpay_request:ok') {
-							uni.showToast({icon: 'none',title: '支付成功'}); 
-							let url = "/pages/chat/index";
+						if (res && res.err_msg == 'get_brand_wcpay_request:ok') {
+							uni.showToast({icon: 'none',title: '支付成功'});
+							that.$emit("okPay");
+							let isTab = false;
+							let url = "/pages/qa/index";
 							if (that.payType == 0 || that.payType == 2) {
 								url = "/pages/wallet/index";
+								isTab = true;
 							} else if (that.payType == 1) {
 								url = "/pages/demand/list";
 							} else if (that.payType == 4) {
 								url = "/pages/index/detail?id=" + that.markIndex;
+							} else {
+								isTab = true;
 							}
-							uni.showLoading();
 							setTimeout(() => {
 								uni.hideToast();
-								//关闭提示后跳转
-								uni.redirectTo({
-									url: url
-								});
-							  }, 800);
+								if (isTab) {
+									uni.switchTab({ url: url });
+								} else {
+									uni.redirectTo({ url: url });
+								}
+							}, 800);
 						}
 						if (res.err_msg == 'get_brand_wcpay_request:cancel') {
 							uni.showToast({icon: 'none',title: '取消支付'}); 

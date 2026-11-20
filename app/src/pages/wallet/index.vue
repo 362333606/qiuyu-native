@@ -1,11 +1,13 @@
 <template>
     <view class="qt-page">
-		<view class="qiuyu-statusbar"></view>
-		<!-- ===== 头部(2026-09-14 v3生产版:去顶部解锁记录pill与功能列表去重) ===== -->
+		<!-- ===== 头部(2026-11-20修:状态栏占位迁入蓝色head内部,修复iOS白字白底;APP内隐藏APP下载) ===== -->
 		<view class="head">
+			<view class="qiuyu-statusbar"></view>
+			<!-- #ifndef APP-PLUS -->
 			<view class="head-top">
 				<view class="head-pill" @click="toDownload">APP下载</view>
 			</view>
+			<!-- #endif -->
 			<view class="eng-label">QIUYU AI · ACCOUNT</view>
 			<view class="head-name">个人中心</view>
 		</view>
@@ -97,10 +99,11 @@
 				<view class="m-facts">
 					<view class="fact"><view class="fact-b">{{ currentCard.totalNum }}场</view><view class="fact-s">总计解析</view></view>
 					<view class="fact"><view class="fact-b">{{ currentCard.type == 3 ? '无限' : currentCard.dayNum + '次' }}</view><view class="fact-s">单日解析</view></view>
-					<view class="fact"><view class="fact-b">¥{{ currentCard.unitPrice }}</view><view class="fact-s">超出/场</view></view>
+					<view class="fact"><view class="fact-b">{{ currentCard.type == 1 ? '¥29' : '¥' + currentCard.unitPrice }}</view><view class="fact-s">{{ currentCard.type == 1 ? '58元场超出后' : '超出/场' }}</view></view>
 				</view>
+				<view class="m-note" v-if="currentCard.type == 1">每日{{ currentCard.dayNum }}次免费解锁可用于58元常规场、188元超级精选（388元超级5A除外）；当日次数用完后：58元场5折(29元)、188元精选9折(169.2元)、388元超级5A原价</view>
 				<view class="m-foot">
-					<view class="m-discount">超出享 {{ tierDiscount[currentCard.type] || '' }} 折</view>
+					<view class="m-discount">{{ currentCard.type == 1 ? ('每日' + currentCard.dayNum + '次免费') : ('超出享 ' + (tierDiscount[currentCard.type] || '') + ' 折') }}</view>
 					<view class="m-expire" v-if="vipType == currentCard.type && vipExpireTime">有效期至 {{ (vipExpireTime || '').slice(0, 10) }}</view>
 					<view class="m-expire" v-else>未开通</view>
 					<view class="m-go" @tap="openVip(currentCard)">{{ vipType == currentCard.type && vipExpireTime ? '立即续费' : '立即开通' }}</view>
@@ -203,7 +206,7 @@ export default {
 			payOrderId: 0,
 			payAmount: 0,
 			isLogin: false,
-			appVersion: '2.2.1',
+			appVersion: '2.2.5',
 			customerServiceImg: '',
 			serviceImgErr: false,
 			phone: '',
@@ -252,6 +255,14 @@ export default {
 		if (uni.getStorageSync('wanju_token')) {
 			this.isLogin = true;
 			this.userDetail()
+		} else {
+			this.isLogin = false;
+			this.balance = 0;
+			this.vipType = 0;
+			this.vipExpireTime = '';
+			this.nickName = '';
+			this.avatarUrl = '';
+			this.phone = '';
 		}
 		this.initPage();
 	},
@@ -290,11 +301,22 @@ export default {
 			that.$refs.servicePopup.open('center');
 		},
 		checkUpdate: function(){
+			// #ifdef APP-PLUS
+			let ver = this.appVersion;
+			try { ver = plus.runtime.version || ver; } catch (e) {}
 			uni.showModal({
-				title: '版本更新',
-				content: '当前版本 v' + this.appVersion + '，已是最新版本',
+				title: '版本信息',
+				content: '当前客户端版本 v' + ver,
 				showCancel: false
 			});
+			// #endif
+			// #ifndef APP-PLUS
+			uni.showModal({
+				title: '版本信息',
+				content: '网页版自动保持最新，无需手动更新',
+				showCancel: false
+			});
+			// #endif
 		},
 		toLogout:function(){
 			uni.showModal({
@@ -302,11 +324,37 @@ export default {
 				content: '确定退出当前账号？',
 				success: (m) => {
 					if (!m.confirm) return;
+					let oldTk = '';
+					try { oldTk = uni.getStorageSync('wanju_token') || ''; } catch(e){}
+					if (oldTk) {
+						try {
+							uni.request({
+								url: 'https://qyai001.cn/api/user/logout',
+								method: 'POST',
+								header: { 'X-wanju-Token': oldTk }
+							});
+						} catch(e){}
+					}
 					this.isLogin = false;
 					this.balance = 0;
-					try { uni.removeStorageSync('wanju_token'); uni.removeStorageSync('wanju_nickName'); uni.removeStorageSync('wanju_avatarUrl'); } catch(e){}
-					// #ifdef APP-PLUS
-					try { plus.storage.removeItem('unlocked_'); } catch(e) {}
+					this.vipType = 0;
+					this.vipExpireTime = '';
+					this.nickName = '';
+					this.avatarUrl = '';
+					this.phone = '';
+					try {
+						uni.removeStorageSync('wanju_token');
+						uni.removeStorageSync('wanju_nickName');
+						uni.removeStorageSync('wanju_avatarUrl');
+						uni.removeStorageSync('wanju_user_op');
+						uni.removeStorageSync('game_ai_openid');
+						uni.setStorageSync('wanju_logout_ts', String(Date.now()));
+					} catch(e){}
+					// #ifdef H5
+					try {
+						window.__wanju_token__ = '';
+						['wanju_token','uni_wanju_token','uni_wanju_user_info','wanju_user_op','uni_wanju_user_op','game_ai_openid','uni_game_ai_openid'].forEach(k => localStorage.removeItem(k));
+					} catch(e){}
 					// #endif
 					uni.showToast({icon:'none', title:'已退出'});
 					setTimeout(() => { uni.navigateTo({ url: '/pages/login/login' }); }, 600);
@@ -359,7 +407,7 @@ export default {
 			uni.navigateTo({ url: url })
 		},
 		closePay: function() { this.isPay = false; },
-		okPay: function() { this.isPay = false; },
+		okPay: function() { this.isPay = false; if (this.isLogin) { this.userDetail(); } },
 		loadVipCardList:function(){
 			let that = this
 			that.ajax(that.url.vipCard,"get",{},function(resp){

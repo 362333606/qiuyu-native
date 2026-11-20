@@ -3,7 +3,7 @@
 		<!-- tab3智能问答:web-view嵌线上/qa/五环闭环版(20260904 v2.1.1)
 		     原chat/index.vue的TUIKit老聊天在app端JS引擎(无DOM)模块链炸→整页白屏,
 		     且非线上智能问答形态;此页保留git历史可回退(pages.json改回pagePath即可) -->
-		<web-view :src="qaUrl" :webview-styles="wvStyles"></web-view>
+		<web-view :src="qaUrl" :webview-styles="wvStyles" @message="onWebMsg"></web-view>
 	</view>
 </template>
 
@@ -21,10 +21,21 @@ export default {
 		if (u !== this.qaUrl) this.qaUrl = u;
 	},
 	methods: {
+		onWebMsg(e) {
+			const list = (e && e.detail && e.detail.data) || [];
+			const last = list[list.length - 1] || {};
+			if (last.action === 'login') {
+				uni.navigateTo({ url: '/pages/login/login' });
+			} else if (last.action === 'wallet') {
+				uni.switchTab({ url: '/pages/wallet/index' });
+			}
+		},
 		qaBuildUrl() { // from=app:H5侧据此隐藏网页版"退出登录"(20260905张总令)+注入登录令牌
 			let tk = '';
 			try { tk = uni.getStorageSync('wanju_token') || ''; } catch (e) {}
-			return 'https://qyai001.cn/qa/?from=app' + (tk ? '&token=' + encodeURIComponent(tk) : '');
+			let lts = '';
+			try { lts = uni.getStorageSync('wanju_logout_ts') || ''; } catch (e) {}
+			return 'https://qyai001.cn/qa/?from=app' + (tk ? '&token=' + encodeURIComponent(tk) : '&logout=1' + (lts ? '&_t=' + encodeURIComponent(lts) : ''));
 		}
 	}
 }

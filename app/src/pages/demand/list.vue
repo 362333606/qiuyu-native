@@ -164,9 +164,14 @@ export default {
 			}
 		},
 		goHome:function(){
+			// #ifdef H5
+			window.location.href = '/matchv2/';
+			// #endif
+			// #ifndef H5
 			uni.switchTab({
-				url:'/pages/match/index'
+				url:'/pages/web/matchv2'
 			});
+			// #endif
 		},
 		unlockTime:function(item){
 			let s = (item.createDate || '');

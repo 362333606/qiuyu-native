@@ -101,9 +101,14 @@ export default {
 				uni.showToast({icon: 'none',title: '请选择充值套餐'}); 
 			    return false;
 			}
+			var curPkg = this.rechargeList.find(function(x){ return String(x.id) === String(_that.balanceId); });
+			if (!curPkg) {
+				uni.showToast({icon: 'none',title: '套餐已更新，请重新选择'});
+				return false;
+			}
 			let param = {};
 			param.pid = this.balanceId;
-			param.amount = this.rechargeList[this.balanceId-1].price;
+			param.amount = curPkg.price;
 			_that.ajax(_that.url.balanceDeposit, "post", param, function(res) {
 				_that.payOrderId = res.data.id;
 				_that.payAmount = res.data.balance;
