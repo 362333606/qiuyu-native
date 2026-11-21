@@ -101,9 +101,10 @@ Vue.prototype.ajax = function(url, method, data, fun) {
 		data: data,
 		success: function(resp) {
 			uni.hideLoading();
-			if (resp.statusCode == 401 || (resp.statusCode == 200 && resp.data && (resp.data.code == 401 || resp.data.code == 501))) {
+			const msg = String((resp.data && resp.data.msg) || "");
+			if (resp.statusCode == 401 || (resp.statusCode == 200 && resp.data && (resp.data.code == 401 || (resp.data.code != 200 && msg.indexOf("请登录") >= 0)))) {
 				try { uni.removeStorageSync("wanju_token"); } catch (e) {}
-				uni.showToast({ icon: "none", title: (resp.data && resp.data.msg) || "请重新登录" });
+				uni.showToast({ icon: "none", title: msg || "请重新登录" });
 				setTimeout(() => {
 					uni.navigateTo({ url: "/pages/login/login" });
 				}, 400);
@@ -118,7 +119,7 @@ Vue.prototype.ajax = function(url, method, data, fun) {
 			} else {
 				uni.showToast({
 					icon: "none",
-					title: resp.data.msg
+					title: msg || "操作失败"
 				})
 			}
 		},
