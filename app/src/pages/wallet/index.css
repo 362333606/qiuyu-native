@@ -645,12 +645,165 @@ page {
 	margin-top: 24rpx;
 }
 
-.m-note {
-	margin-top: 18rpx;
+/* ============ 会员权益结构化规则块(对齐网页版2026-11-21) ============ */
+.m-rules {
+	position: relative;
+	z-index: 1;
+	margin-top: 22rpx;
+	border-radius: 24rpx;
+	padding: 20rpx 22rpx;
+	background: rgba(9, 24, 56, .34);
+	border: 2rpx solid rgba(255, 255, 255, .16);
+	box-shadow: inset 0 2rpx 0 rgba(255, 255, 255, .08);
+}
+.m-rules-gold {
+	border-color: rgba(255, 217, 138, .36);
+	background: rgba(12, 26, 56, .42);
+}
+.r-head {
+	display: flex;
+	align-items: center;
+	justify-content: space-between;
+	gap: 16rpx;
+}
+.r-title {
+	display: flex;
+	align-items: center;
+	gap: 12rpx;
+	font-size: 23rpx;
+	font-weight: 800;
+	color: #ffd98a;
+	letter-spacing: 0.6rpx;
+	line-height: 1.2;
+}
+.r-title-after {
+	color: #e8f2ff;
+	font-weight: 700;
+}
+.r-dot {
+	width: 10rpx;
+	height: 10rpx;
+	border-radius: 50%;
+	background: #ffd98a;
+	box-shadow: 0 0 12rpx rgba(255, 217, 138, .85);
+	flex-shrink: 0;
+}
+.r-dot-b {
+	background: #7cc4ff;
+	box-shadow: 0 0 12rpx rgba(124, 196, 255, .85);
+}
+.r-excl {
+	font-size: 19rpx;
+	font-weight: 600;
+	color: rgba(255, 255, 255, .78);
+	background: rgba(255, 255, 255, .10);
+	border: 2rpx solid rgba(255, 255, 255, .16);
+	border-radius: 999rpx;
+	padding: 4rpx 16rpx;
+	white-space: nowrap;
+	flex-shrink: 0;
+}
+.r-sub {
+	font-size: 19rpx;
+	color: rgba(255, 255, 255, .56);
+	font-weight: 500;
+	white-space: nowrap;
+}
+.r-scope {
+	display: flex;
+	align-items: center;
+	flex-wrap: wrap;
+	gap: 12rpx;
+	margin-top: 14rpx;
 	font-size: 22rpx;
-	line-height: 1.55;
-	color: rgba(255, 255, 255, 0.85);
-	background: rgba(255, 255, 255, 0.10);
+	color: rgba(255, 255, 255, .72);
+	line-height: 1.3;
+}
+.r-scope-lbl {
+	font-size: 21rpx;
+	color: rgba(255, 255, 255, .68);
+	white-space: nowrap;
+}
+.r-chip {
+	display: inline-flex;
+	align-items: baseline;
+	gap: 6rpx;
+	background: rgba(255, 255, 255, .11);
+	border: 2rpx solid rgba(255, 255, 255, .18);
 	border-radius: 14rpx;
-	padding: 14rpx 18rpx;
+	padding: 6rpx 16rpx;
+	font-size: 22rpx;
+	font-weight: 600;
+	color: #fff;
+	white-space: nowrap;
+}
+.r-chip-p {
+	font-weight: 800;
+	color: #ffd98a;
+	font-family: 'DIN Alternate', -apple-system, sans-serif;
+	font-variant-numeric: tabular-nums;
+}
+.r-div {
+	height: 2rpx;
+	margin: 18rpx 0;
+	background: linear-gradient(90deg, rgba(255, 255, 255, .04), rgba(255, 255, 255, .22) 50%, rgba(255, 255, 255, .04));
+}
+.r-grid {
+	display: grid;
+	grid-template-columns: repeat(3, minmax(0, 1fr));
+	gap: 12rpx;
+	margin-top: 14rpx;
+}
+.r-cell {
+	background: rgba(255, 255, 255, .09);
+	border: 2rpx solid rgba(255, 255, 255, .15);
+	border-radius: 18rpx;
+	padding: 14rpx 8rpx 12rpx;
+	text-align: center;
+	display: flex;
+	flex-direction: column;
+	align-items: center;
+	justify-content: center;
+}
+.r-cell-plain {
+	background: rgba(255, 255, 255, .05);
+	border-color: rgba(255, 255, 255, .11);
+}
+.r-name {
+	font-size: 21rpx;
+	font-weight: 600;
+	color: rgba(255, 255, 255, .84);
+	line-height: 1.2;
+	white-space: nowrap;
+}
+.r-val {
+	font-size: 32rpx;
+	font-weight: 800;
+	color: #ffd98a;
+	font-family: 'DIN Alternate', -apple-system, sans-serif;
+	font-variant-numeric: tabular-nums;
+	line-height: 1.15;
+	margin-top: 8rpx;
+	letter-spacing: -0.4rpx;
+	white-space: nowrap;
+}
+.r-val-plain {
+	color: #fff;
+}
+.r-tag {
+	margin-top: 8rpx;
+	font-size: 19rpx;
+	font-weight: 700;
+	line-height: 1.3;
+	padding: 2rpx 14rpx;
+	border-radius: 999rpx;
+	white-space: nowrap;
+	color: #ffd98a;
+	background: rgba(255, 217, 138, .15);
+	border: 2rpx solid rgba(255, 217, 138, .34);
+}
+.r-tag-plain {
+	color: rgba(255, 255, 255, .74);
+	background: rgba(255, 255, 255, .09);
+	border-color: rgba(255, 255, 255, .18);
 }

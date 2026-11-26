@@ -101,7 +101,28 @@
 					<view class="fact"><view class="fact-b">{{ currentCard.type == 3 ? '无限' : currentCard.dayNum + '次' }}</view><view class="fact-s">单日解析</view></view>
 					<view class="fact"><view class="fact-b">{{ currentCard.type == 1 ? '¥29' : '¥' + currentCard.unitPrice }}</view><view class="fact-s">{{ currentCard.type == 1 ? '58元场超出后' : '超出/场' }}</view></view>
 				</view>
-				<view class="m-note" v-if="currentCard.type == 1">每日{{ currentCard.dayNum }}次免费解锁可用于58元常规场、188元超级精选（388元超级5A除外）；当日次数用完后：58元场5折(29元)、188元精选9折(169.2元)、388元超级5A原价</view>
+				<view class="m-rules" :class="{ 'm-rules-gold': currentCard.type == 3 }" v-if="currentCardRule">
+					<view class="r-head">
+						<view class="r-title"><view class="r-dot"></view>{{ currentCardRule.freeTitle }}</view>
+						<view class="r-excl">{{ currentCardRule.exclude }}</view>
+					</view>
+					<view class="r-scope">
+						<text class="r-scope-lbl">可用于</text>
+						<view class="r-chip" v-for="(fi, fidx) in currentCardRule.freeItems" :key="fidx">{{ fi.name }} <text class="r-chip-p">{{ fi.price }}</text></view>
+					</view>
+					<view class="r-div"></view>
+					<view class="r-head">
+						<view class="r-title r-title-after"><view class="r-dot r-dot-b"></view>{{ currentCardRule.afterTitle }}</view>
+						<view class="r-sub">单场计费标准</view>
+					</view>
+					<view class="r-grid">
+						<view class="r-cell" :class="{ 'r-cell-plain': ai.plain }" v-for="(ai, aidx) in currentCardRule.afterItems" :key="aidx">
+							<view class="r-name">{{ ai.name }}</view>
+							<view class="r-val" :class="{ 'r-val-plain': ai.plain }">{{ ai.price }}</view>
+							<view class="r-tag" :class="{ 'r-tag-plain': ai.plain }">{{ ai.tag }}</view>
+						</view>
+					</view>
+				</view>
 				<view class="m-foot">
 					<view class="m-discount">{{ currentCard.type == 1 ? ('每日' + currentCard.dayNum + '次免费') : ('超出享 ' + (tierDiscount[currentCard.type] || '') + ' 折') }}</view>
 					<view class="m-expire" v-if="vipType == currentCard.type && vipExpireTime">有效期至 {{ (vipExpireTime || '').slice(0, 10) }}</view>
@@ -206,7 +227,7 @@ export default {
 			payOrderId: 0,
 			payAmount: 0,
 			isLogin: false,
-			appVersion: '2.2.5',
+			appVersion: '2.2.7',
 			customerServiceImg: '',
 			serviceImgErr: false,
 			phone: '',
@@ -237,6 +258,54 @@ export default {
 			if (t != 2 && t != 3) return 0;
 			let save = (t == 2 ? 3 : 12) * month - this.currentCard.price;
 			return save > 0 ? Math.round(save) : 0;
+		},
+		currentCardRule() {
+			var t = this.currentCard;
+			if (!t) return null;
+			var free = [
+				{ name: '常规场', price: '¥58' },
+				{ name: '超级精选', price: '¥188' }
+			];
+			if (t.type == 1) {
+				return {
+					freeTitle: '每日免费 ' + (t.dayNum || 6) + ' 次',
+					exclude: '超级6A不能用',
+					freeItems: free,
+					afterTitle: '次数用完后',
+					afterItems: [
+						{ name: '常规场', price: '¥29', tag: '5折', plain: false },
+						{ name: '超级精选', price: '¥169.2', tag: '9折', plain: false },
+						{ name: '超级6A', price: '¥388', tag: '原价', plain: true }
+					]
+				};
+			}
+			if (t.type == 2) {
+				return {
+					freeTitle: '每日免费 ' + (t.dayNum || 8) + ' 次',
+					exclude: '超级6A不能用',
+					freeItems: free,
+					afterTitle: '次数用完后',
+					afterItems: [
+						{ name: '常规场', price: '¥18.8', tag: '会员价', plain: false },
+						{ name: '超级精选', price: '¥150.4', tag: '8折', plain: false },
+						{ name: '超级6A', price: '¥388', tag: '原价', plain: true }
+					]
+				};
+			}
+			if (t.type == 3) {
+				return {
+					freeTitle: '每日不限次数',
+					exclude: '超级6A不能用',
+					freeItems: free,
+					afterTitle: '超出后',
+					afterItems: [
+						{ name: '常规场', price: '¥12.8', tag: '会员价', plain: false },
+						{ name: '超级精选', price: '¥94', tag: '5折', plain: false },
+						{ name: '超级6A', price: '¥388', tag: '原价', plain: true }
+					]
+				};
+			}
+			return null;
 		}
 	},
     onLoad: function (options) {
